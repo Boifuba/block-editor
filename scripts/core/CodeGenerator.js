@@ -9,6 +9,7 @@
  * - Formatting block content based on type and settings
  * - Handling Normal vs Formula mode differences
  * - Assembling final code with proper wrapping and syntax
+ * - Special bracketing when Label and If blocks are both present
  */
 
 import { AVAILABLE_BLOCKS } from '../constants.js';
@@ -44,8 +45,8 @@ export class CodeGenerator {
         console.log(`Block Editor | Code Generator: Generation settings - Blind: ${settings.blind}, Formula: ${settings.formula}`);
         
         // Process blocks and generate code
-        const codeParts = this._processWorkspaceBlocks(blocks, settings);
-        const finalCode = this._assembleFinalCode(codeParts, settings.formula);
+        const { codeParts, hasLabelBlock, hasIfBlock } = this._processWorkspaceBlocks(blocks, settings);
+        const finalCode = this._assembleFinalCode(codeParts, settings.formula, hasLabelBlock, hasIfBlock);
         
         console.log(`Block Editor | Code Generator: Code generation completed - Result: ${finalCode}`);
         this.uiManager.updateCodeDisplay(finalCode);
@@ -55,17 +56,27 @@ export class CodeGenerator {
      * Process all workspace blocks and convert them to formatted code parts
      * @param {NodeList} blocks - The workspace block elements
      * @param {Object} settings - Current checkbox settings
-     * @returns {Array} Array of formatted code parts
+     * @returns {Object} Object containing codeParts, hasLabelBlock, and hasIfBlock
      */
     _processWorkspaceBlocks(blocks, settings) {
         console.log(`Block Editor | Code Generator: Processing ${blocks.length} workspace blocks`);
         
         let codeParts = [];
         let lastBlockType = null;
+        let hasLabelBlock = false;
+        let hasIfBlock = false;
         
         blocks.forEach((block, index) => {
             const blockId = block.dataset.blockId;
             const textarea = block.querySelector('.block-code textarea');
+            
+            // Track presence of label and if blocks
+            if (blockId === 'label') {
+                hasLabelBlock = true;
+            }
+            if (blockId === 'if') {
+                hasIfBlock = true;
+            }
             
             if (textarea && textarea.value.trim()) {
                 const content = textarea.value.trim();
@@ -80,8 +91,11 @@ export class CodeGenerator {
                     codeParts[codeParts.length - 1] += ',';
                 }
                 
+                // Calculate if special bracketing is active
+                const specialBracketingActive = hasLabelBlock && hasIfBlock;
+                
                 // Apply formula mode formatting if enabled
-                const finalContent = this._applyFormulaModeFormatting(formattedContent, blockId, settings.formula);
+                const finalContent = this._applyFormulaModeFormatting(formattedContent, blockId, settings.formula, specialBracketingActive);
                 codeParts.push(finalContent);
                 
                 lastBlockType = blockId;
@@ -89,7 +103,9 @@ export class CodeGenerator {
         });
         
         console.log(`Block Editor | Code Generator: Processed blocks into ${codeParts.length} code parts`);
-        return codeParts;
+        console.log(`Block Editor | Code Generator: Block presence - Label: ${hasLabelBlock}, If: ${hasIfBlock}`);
+        
+        return { codeParts, hasLabelBlock, hasIfBlock };
     }
 
     /**
@@ -167,9 +183,10 @@ export class CodeGenerator {
      * @param {string} content - The formatted content
      * @param {string} blockId - The block type identifier
      * @param {boolean} formulaMode - Whether formula mode is enabled
+     * @param {boolean} specialBracketingActive - Whether special bracketing is active (Label + If present)
      * @returns {string} Content with formula mode formatting applied
      */
-    _applyFormulaModeFormatting(content, blockId, formulaMode) {
+    _applyFormulaModeFormatting(content, blockId, formulaMode, specialBracketingActive) {
         if (!formulaMode) {
             return content;
         }
@@ -177,6 +194,13 @@ export class CodeGenerator {
         // In formula mode, if/else blocks are never wrapped in brackets
         if (blockId === 'if' || blockId === 'else') {
             console.log(`Block Editor | Code Generator: Formula mode - ${blockId} block not wrapped in brackets`);
+            return content;
+        }
+        
+        // Special case: when special bracketing is active and this is a label block,
+        // don't wrap it individually as the entire expression will be wrapped
+        if (specialBracketingActive && blockId === 'label') {
+            console.log(`Block Editor | Code Generator: Special bracketing active - label block not individually wrapped`);
             return content;
         }
         
@@ -189,15 +213,26 @@ export class CodeGenerator {
      * Assemble the final code string with appropriate wrapping and syntax
      * @param {Array} codeParts - Array of formatted code parts
      * @param {boolean} formulaMode - Whether formula mode is enabled
+     * @param {boolean} hasLabelBlock - Whether workspace contains a label block
+     * @param {boolean} hasIfBlock - Whether workspace contains an if block
      * @returns {string} Final assembled code string
      */
-    _assembleFinalCode(codeParts, formulaMode) {
+    _assembleFinalCode(codeParts, formulaMode, hasLabelBlock, hasIfBlock) {
         if (codeParts.length === 0) {
             console.log('Block Editor | Code Generator: No code parts to assemble');
             return '';
         }
         
         console.log(`Block Editor | Code Generator: Assembling final code from ${codeParts.length} parts in ${formulaMode ? 'formula' : 'normal'} mode`);
+        
+        // Calculate if special bracketing should be applied
+        const specialBracketingActive = hasLabelBlock && hasIfBlock;
+        
+        if (specialBracketingActive) {
+            console.log('Block Editor | Code Generator: Special bracketing active - wrapping entire expression in brackets');
+            const intermediateCode = codeParts.join(' ');
+            return `[${intermediateCode}]`;
+        }
         
         if (formulaMode) {
             // Formula mode: parts are already individually wrapped, just join with spaces

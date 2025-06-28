@@ -1,308 +1,318 @@
 # Block Editor - Foundry VTT
 
-Um módulo avançado para Foundry VTT que permite criar e organizar blocos de código visualmente através de uma interface drag-and-drop intuitiva e moderna.
+An advanced module for Foundry VTT that allows creating and organizing code blocks visually through an intuitive and modern drag-and-drop interface.
 
-## 🎯 Visão Geral
+## Overview
 
-O Block Editor é uma ferramenta visual que simplifica a criação de comandos complexos no Foundry VTT. Através de uma interface de arrastar e soltar, os usuários podem construir comandos de forma intuitiva sem precisar conhecer a sintaxe específica.
+The Block Editor is a visual tool that simplifies the creation of complex commands in Foundry VTT. Through a drag-and-drop interface, users can build commands intuitively without needing to know specific syntax.
 
-### ✨ Características Principais
+### Main Features
 
-- 🧩 **Interface Visual Intuitiva**: Arraste e solte blocos para criar código
-- 🎯 **Blocos Especializados**: Blocos específicos para diferentes tipos de dados e operações
-- 💻 **Geração Automática de Código**: Converte a organização visual em código JavaScript válido
-- 🔄 **Execução em Tempo Real**: Execute o código gerado diretamente no Foundry
-- 📋 **Cópia Facilitada**: Copie o código gerado para usar em macros ou outros scripts
-- 🎨 **Interface Moderna**: Design limpo, responsivo e acessível
-- 🔀 **Dois Modos de Operação**: Normal e Fórmula para diferentes necessidades
-- ⌨️ **Atalhos de Teclado**: Acesso rápido via Ctrl+B
-- 🌐 **Suporte Multilíngue**: Português e Inglês
+- **Intuitive Visual Interface**: Drag and drop blocks to create code
+- **Specialized Blocks**: Specific blocks for different types of data and operations
+- **Automatic Code Generation**: Converts visual organization into valid JavaScript code
+- **Real-time Execution**: Execute generated code directly in Foundry
+- **Easy Copying**: Copy generated code for use in macros or other scripts
+- **Modern Interface**: Clean, responsive and accessible design
+- **Two Operation Modes**: Normal and Formula for different needs
+- **Keyboard Shortcuts**: Quick access via Ctrl+B
+- **Multilingual Support**: Portuguese and English
 
-## 🏗️ Arquitetura do Código
+## Code Architecture
 
-O módulo foi completamente refatorado com uma arquitetura modular e bem organizada:
+The module has been completely refactored with a modular and well-organized architecture:
 
-### 📁 Estrutura de Arquivos
+### File Structure
 
 ```
 scripts/
-├── main.js                 # Integração com Foundry VTT e ponto de entrada
-├── BlockEditor.js          # Classe principal orquestradora
-├── constants.js            # Definições de blocos e templates HTML
+├── main.js                 # Foundry VTT integration and entry point
+├── BlockEditor.js          # Main orchestrator class
+├── constants.js            # Block definitions and HTML templates
 ├── ui/
-│   └── UIManager.js        # Gerenciamento de interface e interações
+│   └── UIManager.js        # Interface management and interactions
 └── core/
-    └── CodeGenerator.js    # Lógica de geração de código
+    └── CodeGenerator.js    # Code generation logic
 ```
 
-### 🔧 Responsabilidades dos Componentes
+### Component Responsibilities
 
-#### **main.js** - Integração com Foundry VTT
-- Gerencia hooks do Foundry VTT
-- Registra configurações do módulo
-- Processa comandos de chat (/blocks, /editor)
-- Configura atalhos de teclado
-- Cria e gerencia diálogos
-- Expõe API do módulo
+#### **main.js** - Foundry VTT Integration
+- Manages Foundry VTT hooks
+- Registers module settings
+- Processes chat commands (/blocks, /editor)
+- Configures keyboard shortcuts
+- Creates and manages dialogs
+- Exposes module API
 
-#### **BlockEditor.js** - Orquestrador Principal
-- Coordena comunicação entre componentes
-- Inicializa UIManager e CodeGenerator
-- Fornece interface limpa para acesso externo
-- Gerencia ciclo de vida do editor
+#### **BlockEditor.js** - Main Orchestrator
+- Coordinates communication between components
+- Initializes UIManager and CodeGenerator
+- Provides clean interface for external access
+- Manages editor lifecycle
 
-#### **UIManager.js** - Gerenciamento de Interface
-- Controla todas as interações do usuário
-- Gerencia drag & drop entre paleta e workspace
-- Manipula eventos de botões e checkboxes
-- Controla reordenação de blocos no workspace
-- Gerencia estados visuais e feedback
+#### **UIManager.js** - Interface Management
+- Controls all user interactions
+- Manages drag & drop between palette and workspace
+- Handles button and checkbox events
+- Controls block reordering in workspace
+- Manages visual states and feedback
 
-#### **CodeGenerator.js** - Geração de Código
-- Processa blocos do workspace em código
-- Aplica formatação específica por tipo de bloco
-- Gerencia diferenças entre modo Normal e Fórmula
-- Monta código final com sintaxe apropriada
+#### **CodeGenerator.js** - Code Generation
+- Processes workspace blocks into code
+- Applies specific formatting per block type
+- Manages differences between Normal and Formula modes
+- Assembles final code with appropriate syntax
 
-#### **constants.js** - Definições e Configurações
-- Define todos os blocos disponíveis
-- Contém templates HTML
-- Especifica blocos exclusivos do modo Fórmula
-- Lista blocos com conteúdo fixo (read-only)
+#### **constants.js** - Definitions and Configurations
+- Defines all available blocks
+- Contains HTML templates
+- Specifies Formula mode exclusive blocks
+- Lists blocks with fixed content (read-only)
 
-## 🧩 Blocos Disponíveis
+## Available Blocks
 
-### 📊 Dados do Ator
-- **Atributos**: Acessa `actor.system.attributes`
-- **Spells**: Acessa `actor.system.spells` (prefixo `S:`)
-- **Skills**: Acessa `actor.system.skills` (prefixo `Sk:`)
-- **Costs**: Acessa `actor.system.currency` (prefixo `*Costs`)
+### Actor Data
+- **Attributes**: Accesses `actor.system.attributes`
+- **Spells**: Accesses `actor.system.spells` (prefix `S:`)
+- **Skills**: Accesses `actor.system.skills` (prefix `Sk:`)
+- **Costs**: Accesses `actor.system.currency` (prefix `*Costs`)
 
-### 🏷️ Propriedades e Texto
-- **Label**: Obtém `.label` de um campo (sempre entre aspas)
-- **Text**: Texto literal (sempre entre aspas)
+### Properties and Text
+- **Label**: Gets `.label` from a field (always in quotes)
+- **Text**: Literal text (always in quotes)
 
-### ⚡ Operadores
-- **Mod**: Modificador numérico (sem aspas)
-- **Or**: Operador lógico OU (sempre gera `|`)
+### Operators
+- **Mod**: Numeric modifier (no quotes)
+- **Or**: Logical OR operator (always generates `|`)
 
-### ⚔️ Sistema de Combate (Padrão SK)
-- **Ranged**: Ataques à distância (prefixo `R:`)
-- **Melee**: Ataques corpo a corpo (prefixo `M:`)
-- **Weapon Damage**: Dano da arma (prefixo `D:` com aspas)
-- **Parry**: Defesa aparar (prefixo `P:`)
-- **Damage**: Valores de dano (sem prefixo)
+### Combat System (SK Standard)
+- **Ranged**: Ranged attacks (prefix `R:`)
+- **Melee**: Melee attacks (prefix `M:`)
+- **Weapon Damage**: Weapon damage (prefix `D:` with quotes)
+- **Parry**: Parry defense (prefix `P:`)
+- **Damage**: Damage values (no prefix)
 
-### 🔀 Condicionais (Apenas Modo Fórmula)
-- **Check**: Inicia verificação (sempre gera `?`)
-- **If**: Bloco condicional (sempre gera `/if`)
-- **Else**: Bloco alternativo (sempre gera `/else`)
-- **Line**: Separador de linha (sempre gera `/`)
-- **Based**: Baseado em valor (prefixo `Based:`)
+### Conditionals (Formula Mode Only)
+- **Check**: Starts verification (always generates `?`)
+- **If**: Conditional block (always generates `/if`)
+- **Else**: Alternative block (always generates `/else`)
+- **Line**: Line separator (always generates `/`)
+- **Based**: Based on value (prefix `Based:`)
 
-## 🎮 Modos de Operação
+## Operation Modes
 
-### 📝 Modo Normal
-- Gera código envolvido em colchetes: `[conteúdo]`
-- Ideal para comandos simples e diretos
-- Blind Roll disponível (adiciona prefixo `!`)
-- Exemplo: `[M:Spear "Spear Attack"]`
+### Normal Mode
+- Generates code wrapped in brackets: `[content]`
+- Ideal for simple and direct commands
+- Blind Roll available (adds prefix `!`)
+- Example: `[M:Spear "Spear Attack"]`
 
-### 🧮 Modo Fórmula
-- Cada bloco é envolvido individualmente: `[bloco1] [bloco2]`
-- Habilita blocos condicionais (If, Else, Line, Based)
-- Desabilita Blind Roll automaticamente
-- Ideal para comandos complexos
-- Exemplo: `/if [M:Spear] [D:"spear"]`
+### Formula Mode
+- Each block is wrapped individually: `[block1] [block2]`
+- Enables conditional blocks (If, Else, Line, Based)
+- Automatically disables Blind Roll
+- Ideal for complex commands
+- Example: `/if [M:Spear] [D:"spear"]`
 
-## 🚀 Como Usar
+### Special Bracketing
+- When both Label and If blocks are present, the entire expression is wrapped in brackets
+- Example: `["Acrobatic Dodge!" /if [S:Acrobatics] [Dodge +2] /else [Dodge -2]]`
 
-### 1. **Abrir o Editor**
-- **Comando de Chat**: `/blocks` ou `/editor`
-- **Atalho de Teclado**: `Ctrl + B`
-- **Auto-abertura**: Configure nas configurações do módulo
+## How to Use
 
-### 2. **Construir Comandos**
-- Arraste blocos da paleta para a área de trabalho
-- Organize os blocos na ordem desejada
-- Edite o conteúdo dos blocos clicando nos campos de texto
-- O código é gerado automaticamente conforme você edita
+### 1. **Open the Editor**
+- **Chat Command**: `/blocks` or `/editor`
+- **Keyboard Shortcut**: `Ctrl + B`
+- **Auto-open**: Configure in module settings
 
-### 3. **Usar o Código Gerado**
-- **Copiar**: Use o botão "Copiar" para copiar para a área de transferência
-- **Executar**: Use o botão "Executar" para enviar diretamente para o chat
-- **Usar em Macros**: Cole o código copiado em macros ou scripts
+### 2. **Build Commands**
+- Drag blocks from palette to workspace
+- Organize blocks in desired order
+- Edit block content by clicking on text fields
+- Code is generated automatically as you edit
 
-## 📋 Exemplos Práticos
+### 3. **Use Generated Code**
+- **Copy**: Use "Copy" button to copy to clipboard
+- **Execute**: Use "Execute" button to send directly to chat
+- **Use in Macros**: Paste copied code into macros or scripts
 
-### ⚔️ Ataque Simples (Modo Normal)
+## Practical Examples
+
+### Simple Attack (Normal Mode)
 ```
-Blocos: Melee → Text("Spear")
-Resultado: [M:Spear "Spear"]
-```
-
-### 🔀 Comando Condicional (Modo Fórmula)
-```
-Blocos: If → Melee → Text("Spear") → Weapon Damage → Text("spear")
-Resultado: /if [M:Spear] [D:"spear"]
+Blocks: Melee → Text("Spear")
+Result: [M:Spear "Spear"]
 ```
 
-### 💥 Ataque com Dano (Modo Fórmula)
+### Conditional Command (Formula Mode)
 ```
-Blocos: Melee → Text("Sword") → Line → Damage → Text("1d8+2")
-Resultado: [M:Sword] / [1d8+2]
-```
-
-### 🎲 Teste com Blind Roll (Modo Normal)
-```
-Blocos: Skills → Text("Athletics") (com Blind Roll ativado)
-Resultado: [!Sk:Athletics]
+Blocks: If → Melee → Text("Spear") → Weapon Damage → Text("spear")
+Result: /if [M:Spear] [D:"spear"]
 ```
 
-## ⚙️ Instalação
+### Attack with Damage (Formula Mode)
+```
+Blocks: Melee → Text("Sword") → Line → Damage → Text("1d8+2")
+Result: [M:Sword] / [1d8+2]
+```
 
-1. **Baixar o Módulo**: Faça download dos arquivos do módulo
-2. **Extrair**: Extraia na pasta `modules` do seu Foundry VTT
-3. **Ativar**: Ative o módulo nas configurações do mundo
-4. **Usar**: Use `/blocks` ou `Ctrl + B` para abrir o editor
+### Test with Blind Roll (Normal Mode)
+```
+Blocks: Skills → Text("Athletics") (with Blind Roll enabled)
+Result: [!Sk:Athletics]
+```
 
-## 🔧 Configurações
+### Special Bracketing Example
+```
+Blocks: Label → Text("Acrobatic Dodge!") → If → Spells → Text("Acrobatics") → Text("Dodge +2") → Else → Text("Dodge -2")
+Result: ["Acrobatic Dodge!" /if [S:Acrobatics] [Dodge +2] /else [Dodge -2]]
+```
 
-### 📋 Configurações Disponíveis
-- **Abrir automaticamente**: Abre o editor quando o mundo carrega
-- **Blind Roll**: Adiciona prefixo `!` (desabilitado no Modo Fórmula)
-- **Modo Fórmula**: Habilita blocos condicionais e formatação especial
+## Installation
 
-### ⌨️ Comandos e Atalhos
-- `/blocks` ou `/editor`: Abre o editor de blocos
-- `Ctrl + B`: Atalho de teclado para abrir o editor
+1. **Download Module**: Download module files
+2. **Extract**: Extract to `modules` folder in your Foundry VTT
+3. **Activate**: Activate module in world settings
+4. **Use**: Use `/blocks` or `Ctrl + B` to open editor
 
-## 🎨 Formatação Automática
+## Settings
 
-### 🏷️ Prefixos Automáticos
-- **Skills**: `Sk:valor` (sem espaço)
-- **Spells**: `S: valor` (com espaço)
-- **Costs**: `*Costs valor`
-- **Ranged**: `R:valor` (sem espaço)
-- **Melee**: `M:valor` (sem espaço)
-- **Weapon Damage**: `D:"valor"` (com aspas, sem espaço)
-- **Parry**: `P:valor` (sem espaço)
-- **Based**: `Based:valor` (sem espaço)
+### Available Settings
+- **Auto-open**: Opens editor when world loads
+- **Blind Roll**: Adds prefix `!` (disabled in Formula Mode)
+- **Formula Mode**: Enables conditional blocks and special formatting
 
-### 📝 Aspas Automáticas
-- **Label/Text**: Sempre entre aspas duplas
-- **Weapon Damage**: Sempre entre aspas duplas
+### Commands and Shortcuts
+- `/blocks` or `/editor`: Opens block editor
+- `Ctrl + B`: Keyboard shortcut to open editor
 
-### 🔒 Valores Fixos (Não Editáveis)
-- **Or**: Sempre gera `|`
-- **Check**: Sempre gera `?`
-- **If**: Sempre gera `/if`
-- **Else**: Sempre gera `/else`
-- **Line**: Sempre gera `/`
+## Automatic Formatting
 
-## 🛠️ Desenvolvimento
+### Automatic Prefixes
+- **Skills**: `Sk:value` (no space)
+- **Spells**: `S: value` (with space)
+- **Costs**: `*Costs value`
+- **Ranged**: `R:value` (no space)
+- **Melee**: `M:value` (no space)
+- **Weapon Damage**: `D:"value"` (with quotes, no space)
+- **Parry**: `P:value` (no space)
+- **Based**: `Based:value` (no space)
 
-### 🏗️ Arquitetura de Classes
+### Automatic Quotes
+- **Label/Text**: Always in double quotes
+- **Weapon Damage**: Always in double quotes
+
+### Fixed Values (Non-editable)
+- **Or**: Always generates `|`
+- **Check**: Always generates `?`
+- **If**: Always generates `/if`
+- **Else**: Always generates `/else`
+- **Line**: Always generates `/`
+
+## Development
+
+### Class Architecture
 
 ```javascript
-// Classe principal orquestradora
+// Main orchestrator class
 class BlockEditor {
-    constructor(html)              // Inicializa componentes
-    _initializeComponents()        // Configura comunicação entre componentes
-    getUIManager()                 // Acesso ao gerenciador de UI
-    getCodeGenerator()             // Acesso ao gerador de código
-    generateCode()                 // Geração manual de código
-    getWorkspaceState()            // Estado atual do workspace
+    constructor(html)              // Initializes components
+    _initializeComponents()        // Configures communication between components
+    getUIManager()                 // Access to UI manager
+    getCodeGenerator()             // Access to code generator
+    generateCode()                 // Manual code generation
+    getWorkspaceState()            // Current workspace state
 }
 
-// Gerenciador de interface
+// Interface manager
 class UIManager {
-    constructor(html, codeGenerator)  // Inicializa UI
-    _setupEventListeners()           // Configura eventos
-    _addBlockToWorkspace()           // Adiciona bloco ao workspace
-    _setupDragAndDropSystem()        // Sistema de drag & drop
-    _clearWorkspace()                // Limpa workspace
-    // ... outros métodos de UI
+    constructor(html, codeGenerator)  // Initializes UI
+    _setupEventListeners()           // Configures events
+    _addBlockToWorkspace()           // Adds block to workspace
+    _setupDragAndDropSystem()        // Drag & drop system
+    _clearWorkspace()                // Clears workspace
+    // ... other UI methods
 }
 
-// Gerador de código
+// Code generator
 class CodeGenerator {
-    constructor(uiManager)           // Inicializa gerador
-    generateCode()                   // Gera código do workspace
-    _formatBlockContent()            // Formata conteúdo dos blocos
-    _assembleFinalCode()             // Monta código final
-    // ... outros métodos de geração
+    constructor(uiManager)           // Initializes generator
+    generateCode()                   // Generates code from workspace
+    _formatBlockContent()            // Formats block content
+    _assembleFinalCode()             // Assembles final code
+    // ... other generation methods
 }
 ```
 
-### 🔧 Constantes Importantes
+### Important Constants
 
 ```javascript
-// Blocos disponíveis com configurações
+// Available blocks with configurations
 AVAILABLE_BLOCKS = { ... }
 
-// Blocos visíveis apenas no Modo Fórmula
+// Blocks visible only in Formula Mode
 FORMULA_ONLY_BLOCKS = ['if', 'else', 'line', 'based']
 
-// Blocos com conteúdo fixo (não editável)
+// Blocks with fixed content (non-editable)
 READONLY_BLOCKS = ['or', 'check', 'if', 'else', 'line']
 ```
 
-### 📝 Logs e Debugging
+### Logs and Debugging
 
-O módulo inclui logging detalhado para facilitar o desenvolvimento e debugging:
+The module includes detailed logging to facilitate development and debugging:
 
 ```javascript
-// Exemplos de logs informativos
+// Examples of informative logs
 console.log('Block Editor | UI Manager: Adding block to workspace');
 console.log('Block Editor | Code Generator: Processing 3 workspace blocks');
 console.log('Block Editor | Main Controller: Component communication established');
 ```
 
-## 🔍 Compatibilidade
+## Compatibility
 
-- **Foundry VTT**: v10+ (testado até v13)
-- **Sistemas**: Compatível com sistemas que usam padrão SK
-- **Navegadores**: Chrome, Firefox, Safari, Edge (versões modernas)
+- **Foundry VTT**: v10+ (tested up to v13)
+- **Systems**: Compatible with systems using SK standard
+- **Browsers**: Chrome, Firefox, Safari, Edge (modern versions)
 
-## 🐛 Solução de Problemas
+## Troubleshooting
 
-### 📋 Problemas Comuns
+### Common Issues
 
-1. **Editor não abre**: Verifique se o módulo está ativado
-2. **Blocos não aparecem**: Verifique o console para erros
-3. **Código não gera**: Certifique-se de que há blocos no workspace
-4. **Drag & drop não funciona**: Verifique se o navegador suporta HTML5 drag & drop
+1. **Editor doesn't open**: Check if module is activated
+2. **Blocks don't appear**: Check console for errors
+3. **Code doesn't generate**: Make sure there are blocks in workspace
+4. **Drag & drop doesn't work**: Check if browser supports HTML5 drag & drop
 
-### 🔍 Debugging
+### Debugging
 
-1. Abra o console do navegador (F12)
-2. Procure por mensagens que começam com "Block Editor |"
-3. Logs detalhados mostram cada operação realizada
-4. Reporte bugs com informações do console
+1. Open browser console (F12)
+2. Look for messages starting with "Block Editor |"
+3. Detailed logs show each operation performed
+4. Report bugs with console information
 
-## 📄 Licença
+## License
 
-Este módulo é distribuído sob licença MIT. Veja o arquivo LICENSE para mais detalhes.
+This module is distributed under MIT license. See LICENSE file for more details.
 
-## 🤝 Contribuição
+## Contribution
 
-Contribuições são bem-vindas! Por favor:
+Contributions are welcome! Please:
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Abra um Pull Request
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Open a Pull Request
 
-## 📞 Suporte
+## Support
 
-Para dúvidas, problemas ou sugestões:
+For questions, issues or suggestions:
 
-1. Verifique esta documentação
-2. Consulte o console do navegador para logs detalhados
-3. Abra uma issue no repositório do projeto
-4. Inclua informações do console ao reportar bugs
+1. Check this documentation
+2. Check browser console for detailed logs
+3. Open an issue in the project repository
+4. Include console information when reporting bugs
 
 ---
 
-**Desenvolvido com ❤️ para a comunidade Foundry VTT**
+**Developed with love for the Foundry VTT community**
