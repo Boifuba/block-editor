@@ -10,6 +10,7 @@ Um módulo para Foundry VTT que permite criar e organizar blocos de código visu
 - 🔄 **Execução em Tempo Real**: Execute o código gerado diretamente no Foundry
 - 📋 **Cópia Fácil**: Copie o código gerado para usar em outros lugares
 - 🎨 **Interface Intuitiva**: Design limpo e responsivo
+- 🔀 **Modo Fórmula**: Modo especial para comandos condicionais avançados
 
 ## Blocos Disponíveis
 
@@ -20,20 +21,39 @@ Um módulo para Foundry VTT que permite criar e organizar blocos de código visu
 - **Costs**: Acessa `actor.system.currency`
 
 ### Propriedades
-- **Value**: Obtém `.value` de um campo
 - **Label**: Obtém `.label` de um campo
 - **Text**: Texto literal `"texto"`
 
 ### Operadores
-- **Equal**: Operador de igualdade `==`
-- **Less**: Operador menor que `<`
-- **Plus**: Operador de adição `+`
+- **Mod**: Modificador numérico
 - **Or**: Operador lógico OU `||`
 
-### Condicionais
-- **Check**: Inicia verificação `if(`
-- **If**: Bloco condicional `) {`
-- **Else**: Bloco alternativo `} else {`
+### Combate (Padrão SK)
+- **Ranged**: Ataques à distância `R:`
+- **Melee**: Ataques corpo a corpo `M:`
+- **Weapon Damage**: Dano da arma `D:"valor"`
+- **Parry**: Defesa aparar `P:`
+- **Damage**: Valores de dano
+
+### Condicionais (Apenas Modo Fórmula)
+- **Check**: Inicia verificação `?`
+- **If**: Bloco condicional `/if`
+- **Else**: Bloco alternativo `/else`
+- **Line**: Separador de linha `/`
+- **Based**: Baseado em valor `Based:`
+
+## Modos de Operação
+
+### Modo Normal
+- Gera código envolvido em colchetes: `[conteúdo]`
+- Ideal para comandos simples
+- Blind Roll disponível
+
+### Modo Fórmula
+- Cada bloco é envolvido individualmente: `[bloco1] [bloco2]`
+- Habilita blocos condicionais (If, Else, Line, Based)
+- Desabilita Blind Roll automaticamente
+- Ideal para comandos complexos como `/if [M:Spear] [D:"spear"]`
 
 ## Como Usar
 
@@ -45,7 +65,7 @@ Um módulo para Foundry VTT que permite criar e organizar blocos de código visu
 2. **Criar Código**:
    - Arraste blocos da paleta para a área de trabalho
    - Organize os blocos na ordem desejada
-   - Clique em "Gerar Código" para ver o resultado
+   - O código é gerado automaticamente
 
 3. **Usar o Código**:
    - Copie o código gerado
@@ -54,23 +74,23 @@ Um módulo para Foundry VTT que permite criar e organizar blocos de código visu
 
 ## Exemplos de Uso
 
-### Verificar Atributo
+### Ataque Simples (Modo Normal)
 ```
-Atributos → Value → Equal → Text("10") → Check → If
+Melee → Text("Spear")
 ```
-Gera: `if(actor.system.attributes.value == "10") {`
+Gera: `[M:Spear "Spear"]`
 
-### Somar Valores
+### Comando Condicional (Modo Fórmula)
 ```
-Atributos → Value → Plus → Skills → Value
+If → Melee → Text("Spear") → Weapon Damage → Text("spear")
 ```
-Gera: `actor.system.attributes.value + actor.system.skills.value`
+Gera: `/if [M:Spear] [D:"spear"]`
 
-### Condição Complexa
+### Ataque com Dano (Modo Fórmula)
 ```
-Atributos → Value → Less → Text("5") → Or → Skills → Value → Equal → Text("0") → Check → If
+Melee → Text("Sword") → Line → Damage → Text("1d8+2")
 ```
-Gera: `if(actor.system.attributes.value < "5" || actor.system.skills.value == "0") {`
+Gera: `[M:Sword] / [1d8+2]`
 
 ## Instalação
 
@@ -82,16 +102,41 @@ Gera: `if(actor.system.attributes.value < "5" || actor.system.skills.value == "0
 ## Configurações
 
 - **Abrir automaticamente**: Abre o editor quando o mundo carrega
+- **Blind Roll**: Adiciona prefixo `!` (desabilitado no Modo Fórmula)
+- **Modo Fórmula**: Habilita blocos condicionais e formatação especial
 
 ## Comandos
 
-- `/blocks` ou `/blocos`: Abre o editor de blocos
+- `/blocks` ou `/editor`: Abre o editor de blocos
 - `Ctrl + B`: Atalho de teclado para abrir o editor
+
+## Formatação Automática
+
+### Prefixos Automáticos
+- **Skills**: `Sk:valor`
+- **Spells**: `S: valor`
+- **Costs**: `*Costs valor`
+- **Ranged**: `R:valor`
+- **Melee**: `M:valor`
+- **Weapon Damage**: `D:"valor"` (com aspas)
+- **Parry**: `P:valor`
+- **Based**: `Based:valor`
+
+### Aspas Automáticas
+- **Label/Text**: Sempre entre aspas duplas
+- **Weapon Damage**: Sempre entre aspas duplas
+
+### Valores Fixos
+- **Or**: Sempre gera `|`
+- **Check**: Sempre gera `?`
+- **If**: Sempre gera `/if`
+- **Else**: Sempre gera `/else`
+- **Line**: Sempre gera `/`
 
 ## Compatibilidade
 
 - Foundry VTT v10+
-- Testado até a versão 11
+- Testado até a versão 13
 
 ## Suporte
 

@@ -42,12 +42,6 @@ const AVAILABLE_BLOCKS = {
         codigo: '',
         descricao: "Character attributes like Strength, Dexterity, etc."
     },
-    'equal': {
-        nome: "Equal",
-        icone: 'fas fa-equals',
-        codigo: '',
-        descricao: "Equality comparison operator"
-    },
     'mod': {
         nome: "Modifier",
         icone: 'fas fa-calculator',
@@ -80,7 +74,7 @@ const AVAILABLE_BLOCKS = {
     },
     'damage': {
         nome: "Damage",
-        icone: 'fas fa-sword',
+        icone: 'fas fa-burst',
         codigo: '',
         descricao: "Damage values and calculations"
     },
@@ -88,7 +82,7 @@ const AVAILABLE_BLOCKS = {
         nome: "Line",
         icone: 'fas fa-slash',
         codigo: '/',
-        descricao: "Line separator"
+        descricao: "Line separator (Formula Mode only)"
     },
     'ranged': {
         nome: "Ranged",
@@ -104,7 +98,7 @@ const AVAILABLE_BLOCKS = {
     },
     'weapond': {
         nome: "Weapon Damage",
-        icone: 'fas fa-hammer',
+        icone: 'fas fa-hand-fist',
         codigo: '',
         descricao: "Weapon damage values"
     },
@@ -142,7 +136,7 @@ const AVAILABLE_BLOCKS = {
         nome: "Based",
         icone: 'fas fa-foundation',
         codigo: '',
-        descricao: "Based on another value"
+        descricao: "Based on another value (Formula Mode only)"
     }
 };
 
@@ -166,7 +160,7 @@ function openBlockEditor() {
                     <h3><i class="fas fa-th-large"></i> Blocks Palette</h3>
                     <div class="palette-grid" id="palette-grid">
                         ${Object.entries(AVAILABLE_BLOCKS).map(([id, bloco]) => `
-                            <div class="block-item" data-block-id="${id}" draggable="true" ${(['if', 'else'].includes(id)) ? 'style="display: none;"' : ''}>
+                            <div class="block-item" data-block-id="${id}" draggable="true" ${(['if', 'else', 'line', 'based'].includes(id)) ? 'style="display: none;"' : ''}>
                                 <i class="${bloco.icone}"></i>
                                 <span>${bloco.nome}</span>
                             </div>
@@ -293,16 +287,12 @@ function initializeEditor(html) {
                         content = `M:${content}`;
                         break;
                     case 'weapond':
-                        // Add D: prefix (SK standard)
-                        content = `D:${content}`;
+                        // Add D: prefix (SK standard) with quotes
+                        content = `D:"${content}"`;
                         break;
                     case 'parry':
                         // Add P: prefix (SK standard)
                         content = `P:${content}`;
-                        break;
-                    case 'equal':
-                        // Equal is =value without spaces
-                        content = `=${content}`;
                         break;
                     case 'mod':
                         // Mod has no quotes
@@ -381,18 +371,37 @@ function initializeEditor(html) {
         html.find('#codigo-gerado').val(finalCode);
     }
     
-    // Function to toggle if/else blocks visibility
-    function toggleIfElseBlocks() {
+    // Function to toggle formula-only blocks visibility
+    function toggleFormulaOnlyBlocks() {
         const formulaChecked = html.find('#formula-checkbox')[0].checked;
         const ifBlock = html.find('[data-block-id="if"]')[0];
         const elseBlock = html.find('[data-block-id="else"]')[0];
+        const lineBlock = html.find('[data-block-id="line"]')[0];
+        const basedBlock = html.find('[data-block-id="based"]')[0];
         
         if (formulaChecked) {
             ifBlock.style.display = 'flex';
             elseBlock.style.display = 'flex';
+            lineBlock.style.display = 'flex';
+            basedBlock.style.display = 'flex';
         } else {
             ifBlock.style.display = 'none';
             elseBlock.style.display = 'none';
+            lineBlock.style.display = 'none';
+            basedBlock.style.display = 'none';
+        }
+    }
+    
+    // Function to handle checkbox exclusivity
+    function handleCheckboxExclusivity() {
+        const formulaCheckbox = html.find('#formula-checkbox')[0];
+        const blindCheckbox = html.find('#blind-checkbox')[0];
+        
+        if (formulaCheckbox.checked) {
+            blindCheckbox.checked = false;
+            blindCheckbox.disabled = true;
+        } else {
+            blindCheckbox.disabled = false;
         }
     }
     
@@ -520,17 +529,22 @@ function initializeEditor(html) {
         }
     });
     
-    // Add event listeners for checkboxes to regenerate code and toggle if/else
+    // Add event listeners for checkboxes
     html.find('#blind-checkbox').each(function() {
         this.addEventListener('change', generateCode);
     });
     
     html.find('#formula-checkbox').each(function() {
         this.addEventListener('change', function() {
-            toggleIfElseBlocks();
+            toggleFormulaOnlyBlocks();
+            handleCheckboxExclusivity();
             generateCode();
         });
     });
+    
+    // Initialize checkbox states and block visibility
+    toggleFormulaOnlyBlocks();
+    handleCheckboxExclusivity();
     
     function addBlockToWorkspace(blockId, html) {
         if (!AVAILABLE_BLOCKS[blockId]) return;

@@ -53,10 +53,6 @@
         "name": "Value",
         "description": "Gets the value of a field"
       },
-      "equal": {
-        "name": "Equal",
-        "description": "Equality operator"
-      },
       "less": {
         "name": "Less",
         "description": "Less than operator"
@@ -103,7 +99,7 @@
       },
       "based": {
         "name": "Based",
-        "description": "Based value prefix"
+        "description": "Based value prefix (Formula Mode only)"
       },
       "mod": {
         "name": "Mod",
@@ -115,7 +111,7 @@
       },
       "line": {
         "name": "Line",
-        "description": "Line separator"
+        "description": "Line separator (Formula Mode only)"
       },
       "ranged": {
         "name": "Ranged",
@@ -148,14 +144,14 @@
       "blockDescriptions": {
         "data": "Attributes/Skills/Spells: To access actor data",
         "label": "Label: For specific properties (always appears first)",
-        "operators": "Equal/Mod: Mathematical and logical operators",
-        "conditionals": "Check/If/Else: Conditional structures (fixed values)",
+        "operators": "Mod: Mathematical operators",
+        "conditionals": "Check/If/Else: Conditional structures (fixed values, Formula Mode only)",
         "text": "Text: Literal text",
         "damage": "Damage: For damage dealt",
-        "line": "Line: Line separator (always generates \"/\")",
+        "line": "Line: Line separator (always generates \"/\", Formula Mode only)",
         "combat": "Ranged/Melee/Weapond/Parry: Follow SK pattern (R:, M:, D:, P:)",
         "or": "Or: Logical operator (always generates \"|\")",
-        "based": "Based: Based value with prefix \"Based:\""
+        "based": "Based: Based value with prefix \"Based:\" (Formula Mode only)"
       },
       "formatting": "Automatic formatting:",
       "formatRules": {
@@ -166,24 +162,23 @@
         "damage": "Damage: Direct value without prefix",
         "ranged": "Ranged: Prefix \"R:\" added automatically (no space)",
         "melee": "Melee: Prefix \"M:\" added automatically (no space)",
-        "weapond": "Weapond: Prefix \"D:\" added automatically (no space)",
+        "weapond": "Weapond: Prefix \"D:\" added automatically with quotes (no space)",
         "parry": "Parry: Prefix \"P:\" added automatically (no space)",
-        "equal": "Equal: Prefix \"=\" added automatically (no spaces)",
         "mod": "Mod: No quotes, direct value",
-        "line": "Line: Always generates \"/\" automatically",
+        "line": "Line: Always generates \"/\" automatically (Formula Mode only)",
         "or": "Or: Always generates \"|\" automatically",
         "check": "Check: Always generates \"?\" automatically",
-        "ifElse": "If/Else: Always generate \"/if\" and \"/else\" automatically",
-        "based": "Based: Prefix \"Based:\" added automatically"
+        "ifElse": "If/Else: Always generate \"/if\" and \"/else\" automatically (Formula Mode only)",
+        "based": "Based: Prefix \"Based:\" added automatically (Formula Mode only)"
       },
       "checkboxes": "Checkboxes:",
       "checkboxDescriptions": {
-        "blind": "Blind: Adds \"!\" prefix before Skills, Spells, and Attributes",
-        "formula": "Formula: Wraps each block in individual brackets instead of wrapping all",
+        "blind": "Blind: Adds \"!\" prefix before Skills, Spells, and Attributes (disabled in Formula Mode)",
+        "formula": "Formula: Wraps each block in individual brackets and enables conditional blocks",
         "trueCondition": "True Condition: Adds \"?\" prefix before any block"
       },
       "example": "Usage example:",
-      "exampleText": "Drag a \"Label\" block, edit to \"My strength test\", then drag \"Attributes\" and edit to \"ST\". Result will be: [\"My strength test\" ST]",
+      "exampleText": "In Formula Mode: Drag \"If\", \"Melee\" (edit to \"Spear\"), \"Weapon Damage\" (edit to \"spear\"). Result: /if [M:Spear] [D:\"spear\"]",
       "understood": "Understood"
     }
   }
