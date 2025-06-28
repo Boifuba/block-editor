@@ -2,7 +2,7 @@
  * UI Manager for Block Editor
  * 
  * Handles all user interface interactions including drag and drop functionality,
- * block management, workspace operations, and user input events.
+ * block management, workspace operations, user input events, and visual feedback.
  * 
  * This class is responsible for:
  * - Setting up and managing event listeners
@@ -10,9 +10,11 @@
  * - Managing workspace blocks (add, remove, reorder)
  * - Coordinating with CodeGenerator for automatic code generation
  * - Managing user interactions (copy, execute, clear)
+ * - Applying visual feedback based on validation rules
  */
 
 import { FORMULA_ONLY_BLOCKS, READONLY_BLOCKS } from '../constants.js';
+import { validateWorkspace } from '../validation/validationRules.js';
 
 export class UIManager {
     /**
@@ -499,11 +501,58 @@ export class UIManager {
     }
 
     /**
-     * Trigger code generation through the code generator
+     * Apply visual feedback based on validation rules
+     */
+    _applyVisualFeedback() {
+        console.log('Block Editor | UI Manager: Applying visual feedback based on validation rules');
+        
+        // Get current workspace block sequence
+        const workspaceBlocks = this.getWorkspaceBlocks();
+        const blockSequence = Array.from(workspaceBlocks).map(block => block.dataset.blockId);
+        
+        console.log(`Block Editor | UI Manager: Current block sequence: [${blockSequence.join(', ')}]`);
+        
+        // Clear existing validation classes
+        this.html.find('.workspace-block').removeClass('block-error-highlight block-warning-highlight block-info-highlight');
+        this.html.find('.validation-indicator').remove();
+        
+        // Validate workspace and apply feedback
+        const validationIssues = validateWorkspace(blockSequence);
+        
+        if (validationIssues.length > 0) {
+            console.log(`Block Editor | UI Manager: Found ${validationIssues.length} validation issues`);
+            
+            validationIssues.forEach((issue, index) => {
+                console.log(`Block Editor | UI Manager: Issue ${index + 1}: ${issue.ruleName} - highlighting block at index ${issue.highlightIndex}`);
+                
+                const blockToHighlight = workspaceBlocks[issue.highlightIndex];
+                if (blockToHighlight) {
+                    // Add highlight class
+                    $(blockToHighlight).addClass(issue.cssClass);
+                    
+                    // Add validation indicator
+                    const indicator = $(`
+                        <div class="validation-indicator ${issue.severity}" title="${issue.description}">
+                            ${issue.severity === 'error' ? '!' : issue.severity === 'warning' ? '⚠' : 'i'}
+                        </div>
+                    `);
+                    $(blockToHighlight).append(indicator);
+                    
+                    console.log(`Block Editor | UI Manager: Applied ${issue.severity} highlight to block: ${blockToHighlight.dataset.blockId}`);
+                }
+            });
+        } else {
+            console.log('Block Editor | UI Manager: No validation issues found - workspace is clean');
+        }
+    }
+
+    /**
+     * Trigger code generation through the code generator and apply visual feedback
      */
     _triggerCodeGeneration() {
-        console.log('Block Editor | UI Manager: Triggering code generation');
+        console.log('Block Editor | UI Manager: Triggering code generation and visual feedback');
         this.codeGenerator.generateCode();
+        this._applyVisualFeedback();
     }
 
     /**
