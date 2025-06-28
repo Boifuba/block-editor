@@ -206,6 +206,71 @@
     transform: rotate(2deg);
 }
 
+/* Visual feedback classes for validation */
+.workspace-block.block-error-highlight {
+    border-color: #dc3545;
+    background: #fff5f5;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+}
+
+.workspace-block.block-error-highlight .block-header {
+    background: #dc3545;
+    color: white;
+}
+
+.workspace-block.block-warning-highlight {
+    border-color: #ffc107;
+    background: #fffbf0;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+}
+
+.workspace-block.block-warning-highlight .block-header {
+    background: #ffc107;
+    color: #212529;
+}
+
+.workspace-block.block-info-highlight {
+    border-color: #17a2b8;
+    background: #f0f9ff;
+    box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2);
+}
+
+.workspace-block.block-info-highlight .block-header {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Validation indicator */
+.validation-indicator {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.validation-indicator.error {
+    background: #dc3545;
+    color: white;
+}
+
+.validation-indicator.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.validation-indicator.info {
+    background: #17a2b8;
+    color: white;
+}
+
 .block-header {
     background: #6c757d;
     color: white;
@@ -452,6 +517,23 @@
 
 .workspace-block {
     animation: blockDrop 0.3s ease-out;
+}
+
+/* Validation highlight animations */
+@keyframes validationPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(220, 53, 69, 0.1);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+.workspace-block.block-error-highlight {
+    animation: validationPulse 1s ease-out;
 }
 
 /* Drag and drop visual feedback */

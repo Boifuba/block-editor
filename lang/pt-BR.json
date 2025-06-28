@@ -20,6 +20,11 @@
         "close": "Fechar",
         "help": "Ajuda"
       },
+      "checkboxes": {
+        "blind": "Blind",
+        "formula": "Formula",
+        "trueCondition": "Condição Verdadeira"
+      },
       "messages": {
         "blockAdded": "Bloco adicionado!",
         "blockRemoved": "Bloco removido!",
@@ -32,7 +37,12 @@
         "copyError": "Erro ao copiar código!",
         "executeError": "Erro ao executar código:",
         "closed": "Editor de blocos fechado!"
-      }
+      },
+      "placeholders": {
+        "editable": "Digite o conteúdo do bloco aqui...",
+        "readonly": "Este bloco é fixo e não editável"
+      },
+      "dropZone": "Arraste blocos aqui para começar"
     },
     "blocks": {
       "atributos": {
@@ -42,10 +52,6 @@
       "value": {
         "name": "Value",
         "description": "Obtém o valor de um campo"
-      },
-      "equal": {
-        "name": "Equal",
-        "description": "Operador de igualdade"
       },
       "less": {
         "name": "Less",
@@ -79,6 +85,10 @@
         "name": "Or",
         "description": "Operador lógico OU"
       },
+      "and": {
+        "name": "And",
+        "description": "Operador lógico E"
+      },
       "check": {
         "name": "Check",
         "description": "Inicia uma verificação condicional"
@@ -90,6 +100,38 @@
       "else": {
         "name": "Else",
         "description": "Bloco condicional else"
+      },
+      "based": {
+        "name": "Based",
+        "description": "Baseado em outro valor (apenas Modo Fórmula)"
+      },
+      "mod": {
+        "name": "Mod",
+        "description": "Modificador matemático"
+      },
+      "damage": {
+        "name": "Damage",
+        "description": "Dano causado"
+      },
+      "line": {
+        "name": "Line",
+        "description": "Separador de linha (apenas Modo Fórmula)"
+      },
+      "ranged": {
+        "name": "Ranged",
+        "description": "Ataque à distância"
+      },
+      "melee": {
+        "name": "Melee",
+        "description": "Ataque corpo a corpo"
+      },
+      "weapond": {
+        "name": "Weapond",
+        "description": "Dano da arma"
+      },
+      "parry": {
+        "name": "Parry",
+        "description": "Ação de aparar"
       }
     }
   }
