@@ -197,10 +197,9 @@ export class CodeGenerator {
             return content;
         }
         
-        // Special case: when special bracketing is active and this is a label block,
-        // don't wrap it individually as the entire expression will be wrapped
-        if (specialBracketingActive && blockId === 'label') {
-            console.log(`Block Editor | Code Generator: Special bracketing active - label block not individually wrapped`);
+        // In formula mode, label blocks are NEVER wrapped in individual brackets
+        if (blockId === 'label') {
+            console.log(`Block Editor | Code Generator: Formula mode - label block not wrapped in individual brackets`);
             return content;
         }
         
