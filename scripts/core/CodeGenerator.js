@@ -10,6 +10,7 @@
  * - Handling Normal vs Formula mode differences
  * - Assembling final code with proper wrapping and syntax
  * - Special bracketing when Label and If blocks are both present
+ * - Special handling for Based blocks in spells context
  */
 
 import { AVAILABLE_BLOCKS } from '../constants.js';
@@ -83,7 +84,7 @@ export class CodeGenerator {
                 console.log(`Block Editor | Code Generator: Processing block ${index + 1}/${blocks.length} - Type: ${blockId}, Content: "${content}"`);
                 
                 // Format the block content according to its type and settings
-                const formattedContent = this._formatBlockContent(blockId, content, settings.blind);
+                const formattedContent = this._formatBlockContent(blockId, content, settings.blind, blocks, index);
                 
                 // Handle special comma separation for consecutive text blocks
                 if (this._shouldAddCommaSeparator(lastBlockType, blockId, codeParts)) {
@@ -113,16 +114,18 @@ export class CodeGenerator {
      * @param {string} blockId - The block type identifier
      * @param {string} content - The raw content from the block
      * @param {boolean} blindMode - Whether blind mode is enabled
+     * @param {NodeList} allBlocks - All workspace blocks for context analysis
+     * @param {number} currentIndex - Index of current block being processed
      * @returns {string} Formatted content according to block type rules
      */
-    _formatBlockContent(blockId, content, blindMode) {
+    _formatBlockContent(blockId, content, blindMode, allBlocks, currentIndex) {
         console.log(`Block Editor | Code Generator: Formatting content for block type: ${blockId}`);
         
         // Use formatting rules map for cleaner code organization
         const formatters = this._getContentFormatters();
         
         if (formatters[blockId]) {
-            const formatted = formatters[blockId](content, blindMode);
+            const formatted = formatters[blockId](content, blindMode, allBlocks, currentIndex);
             console.log(`Block Editor | Code Generator: Block ${blockId} formatted from "${content}" to "${formatted}"`);
             return formatted;
         }
@@ -143,7 +146,22 @@ export class CodeGenerator {
             
             // Actor data blocks - with optional blind prefix
             'skills': (content, blindMode) => blindMode ? `!Sk:${content}` : `Sk:${content}`,
-            'spells': (content, blindMode) => blindMode ? `!S: ${content}` : `S: ${content}`,
+            'spells': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as S:Spellname (Based:Attribute)
+                    const prefix = blindMode ? '!' : '';
+                    console.log(`Block Editor | Code Generator: Spells block followed by based block - formatting as combined expression`);
+                    return `${prefix}S:${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal spells formatting
+                    return blindMode ? `!S: ${content}` : `S: ${content}`;
+                }
+            },
             'atributos': (content, blindMode) => blindMode ? `!${content}` : content,
             'costs': (content) => `*Costs ${content}`,
             
@@ -156,10 +174,24 @@ export class CodeGenerator {
             // Utility blocks
             'damage': (content) => content,
             'mod': (content) => content,
-            'based': (content) => `Based:${content}`,
+            'based': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the previous block was a spells block
+                const prevBlock = allBlocks && currentIndex > 0 ? allBlocks[currentIndex - 1] : null;
+                const prevBlockId = prevBlock ? prevBlock.dataset.blockId : null;
+                
+                if (prevBlockId === 'spells') {
+                    // Skip this block as it was already processed with the spells block
+                    console.log(`Block Editor | Code Generator: Based block following spells - skipping as it was already processed`);
+                    return null; // Return null to indicate this block should be skipped
+                } else {
+                    // Standalone based block
+                    return `Based:${content}`;
+                }
+            },
             
             // Fixed content blocks - always return the same value
             'or': () => '|',
+            'and': () => '&',
             'check': () => '?',
             'if': () => '/if',
             'else': () => '/else',
@@ -189,6 +221,11 @@ export class CodeGenerator {
     _applyFormulaModeFormatting(content, blockId, formulaMode, specialBracketingActive) {
         if (!formulaMode) {
             return content;
+        }
+        
+        // Skip null content (e.g., based blocks that were processed with spells)
+        if (content === null) {
+            return null;
         }
         
         // In formula mode, if/else blocks are never wrapped in brackets
@@ -225,30 +262,33 @@ export class CodeGenerator {
      * @returns {string} Final assembled code string
      */
     _assembleFinalCode(codeParts, formulaMode, hasLabelBlock, hasIfBlock) {
-        if (codeParts.length === 0) {
+        // Filter out null parts (e.g., based blocks that were processed with spells)
+        const filteredParts = codeParts.filter(part => part !== null);
+        
+        if (filteredParts.length === 0) {
             console.log('Block Editor | Code Generator: No code parts to assemble');
             return '';
         }
         
-        console.log(`Block Editor | Code Generator: Assembling final code from ${codeParts.length} parts in ${formulaMode ? 'formula' : 'normal'} mode`);
+        console.log(`Block Editor | Code Generator: Assembling final code from ${filteredParts.length} parts in ${formulaMode ? 'formula' : 'normal'} mode`);
         
         // Calculate if special bracketing should be applied
         const specialBracketingActive = hasLabelBlock && hasIfBlock;
         
         if (specialBracketingActive) {
             console.log('Block Editor | Code Generator: Special bracketing active - wrapping entire expression in brackets');
-            const intermediateCode = codeParts.join(' ');
+            const intermediateCode = filteredParts.join(' ');
             return `[${intermediateCode}]`;
         }
         
         if (formulaMode) {
             // Formula mode: parts are already individually wrapped, just join with spaces
-            const result = codeParts.join(' ');
+            const result = filteredParts.join(' ');
             console.log(`Block Editor | Code Generator: Formula mode assembly complete: ${result}`);
             return result;
         } else {
             // Normal mode: check for special cases, otherwise wrap everything
-            return this._assembleNormalModeCode(codeParts);
+            return this._assembleNormalModeCode(filteredParts);
         }
     }
 

@@ -85,6 +85,10 @@
         "name": "Or",
         "description": "Operador lógico OU"
       },
+      "and": {
+        "name": "And",
+        "description": "Operador lógico E"
+      },
       "check": {
         "name": "Check",
         "description": "Inicia uma verificação condicional"

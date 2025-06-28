@@ -10,7 +10,7 @@
  * - Text blocks: Labels and literal text content
  * - Operator blocks: Mathematical and logical operators
  * - Combat blocks: SK system combat values (ranged, melee, weapon damage, parry)
- * - Conditional blocks: Formula mode only (if, else, check, line, based)
+ * - Conditional blocks: Formula mode only (if, else, check, line, based, and)
  * - Utility blocks: Damage values and modifiers
  */
 
@@ -67,6 +67,12 @@ export const AVAILABLE_BLOCKS = {
         icone: 'fas fa-code-branch',
         codigo: '|',
         descricao: "Logical OR operator (always generates |)"
+    },
+    'and': {
+        nome: "And",
+        icone: 'fas fa-link',
+        codigo: '&',
+        descricao: "Logical AND operator (always generates &, Formula Mode only)"
     },
 
     // Combat System Blocks (SK Standard)
@@ -138,13 +144,13 @@ export const AVAILABLE_BLOCKS = {
  * Blocks that are only visible in Formula Mode
  * These blocks provide conditional logic and advanced formatting
  */
-export const FORMULA_ONLY_BLOCKS = ['if', 'else', 'line', 'based'];
+export const FORMULA_ONLY_BLOCKS = ['if', 'else', 'line', 'based', 'and'];
 
 /**
  * Blocks that have fixed, non-editable content
  * These blocks always generate the same output regardless of user input
  */
-export const READONLY_BLOCKS = ['or', 'check', 'if', 'else', 'line'];
+export const READONLY_BLOCKS = ['or', 'check', 'if', 'else', 'line', 'and'];
 
 /**
  * HTML template for the Block Editor dialog

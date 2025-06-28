@@ -85,6 +85,10 @@
         "name": "Or",
         "description": "Logical OR operator"
       },
+      "and": {
+        "name": "And",
+        "description": "Logical AND operator"
+      },
       "check": {
         "name": "Check",
         "description": "Start a conditional check"
@@ -151,6 +155,7 @@
         "line": "Line: Line separator (always generates \"/\", Formula Mode only)",
         "combat": "Ranged/Melee/Weapond/Parry: Follow SK pattern (R:, M:, D:, P:)",
         "or": "Or: Logical operator (always generates \"|\")",
+        "and": "And: Logical operator (always generates \"&\", Formula Mode only)",
         "based": "Based: Based value with prefix \"Based:\" (Formula Mode only)"
       },
       "formatting": "Automatic formatting:",
@@ -158,6 +163,7 @@
         "labelText": "Label/Text: Automatically wrapped in double quotes",
         "skills": "Skills: Prefix \"Sk:\" added automatically (no space)",
         "spells": "Spells: Prefix \"S:\" added automatically",
+        "spellsBased": "Spells + Based: Format as \"S:Spellname (Based:Attribute)\"",
         "costs": "Costs: Prefix \"*Costs\" added automatically",
         "damage": "Damage: Direct value without prefix",
         "ranged": "Ranged: Prefix \"R:\" added automatically (no space)",
@@ -167,6 +173,7 @@
         "mod": "Mod: No quotes, direct value",
         "line": "Line: Always generates \"/\" automatically (Formula Mode only)",
         "or": "Or: Always generates \"|\" automatically",
+        "and": "And: Always generates \"&\" automatically (Formula Mode only)",
         "check": "Check: Always generates \"?\" automatically",
         "ifElse": "If/Else: Always generate \"/if\" and \"/else\" automatically (Formula Mode only)",
         "based": "Based: Prefix \"Based:\" added automatically (Formula Mode only)"
