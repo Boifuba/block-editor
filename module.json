@@ -2,7 +2,7 @@
   "id": "block-editor",
   "title": "Editor de Blocos",
   "description": "Um módulo que permite criar e organizar blocos de código visualmente no Foundry VTT",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "compatibility": {
     "minimum": "10",
     "verified": "13"
@@ -27,8 +27,8 @@
     }
   ],
   "url": "",
-  "manifest": "",
-  "download": "",
+  "manifest": "https://github.com/Boifuba/block-editor/releases/download/packs/module.json",
+  "download": "https://github.com/Boifuba/block-editor/releases/download/packs/block-editor.zip",
   "license": "LICENSE",
   "readme": "README.md"
 }
