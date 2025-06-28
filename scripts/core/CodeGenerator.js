@@ -203,6 +203,14 @@ export class CodeGenerator {
             return content;
         }
         
+        // For text blocks in formula mode, remove quotes before wrapping in brackets
+        if (blockId === 'text') {
+            // Remove the outer quotes that were added by _formatBlockContent
+            const unquotedContent = content.replace(/^"(.*)"$/, '$1');
+            console.log(`Block Editor | Code Generator: Formula mode - text block quotes removed: "${content}" -> "${unquotedContent}"`);
+            return `[${unquotedContent}]`;
+        }
+        
         // All other blocks get individual bracket wrapping in formula mode
         console.log(`Block Editor | Code Generator: Formula mode - wrapping ${blockId} block in individual brackets`);
         return `[${content}]`;
