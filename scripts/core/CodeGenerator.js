@@ -11,6 +11,7 @@
  * - Assembling final code with proper wrapping and syntax
  * - Special bracketing when Label and If blocks are both present
  * - Special handling for Based blocks in spells context
+ * - Special handling for modifier chains with & operators in Formula mode
  */
 
 import { AVAILABLE_BLOCKS } from '../constants.js';
@@ -67,6 +68,9 @@ export class CodeGenerator {
         let hasLabelBlock = false;
         let hasIfBlock = false;
         
+        // In formula mode, detect modifier chains for special handling
+        const modifierChains = settings.formula ? this._detectModifierChains(blocks) : [];
+        
         blocks.forEach((block, index) => {
             const blockId = block.dataset.blockId;
             const textarea = block.querySelector('.block-code textarea');
@@ -83,6 +87,11 @@ export class CodeGenerator {
                 const content = textarea.value.trim();
                 console.log(`Block Editor | Code Generator: Processing block ${index + 1}/${blocks.length} - Type: ${blockId}, Content: "${content}"`);
                 
+                // Check if this block is part of a modifier chain
+                const isInModifierChain = modifierChains.some(chain => 
+                    chain.startIndex <= index && index <= chain.endIndex
+                );
+                
                 // Format the block content according to its type and settings
                 const formattedContent = this._formatBlockContent(blockId, content, settings.blind, blocks, index);
                 
@@ -96,17 +105,151 @@ export class CodeGenerator {
                 const specialBracketingActive = hasLabelBlock && hasIfBlock;
                 
                 // Apply formula mode formatting if enabled
-                const finalContent = this._applyFormulaModeFormatting(formattedContent, blockId, settings.formula, specialBracketingActive);
-                codeParts.push(finalContent);
+                const finalContent = this._applyFormulaModeFormatting(
+                    formattedContent, 
+                    blockId, 
+                    settings.formula, 
+                    specialBracketingActive,
+                    isInModifierChain
+                );
+                
+                if (finalContent !== null) {
+                    codeParts.push(finalContent);
+                }
                 
                 lastBlockType = blockId;
             }
         });
         
+        // Post-process modifier chains in formula mode
+        if (settings.formula && modifierChains.length > 0) {
+            codeParts = this._processModifierChains(codeParts, modifierChains, blocks);
+        }
+        
         console.log(`Block Editor | Code Generator: Processed blocks into ${codeParts.length} code parts`);
         console.log(`Block Editor | Code Generator: Block presence - Label: ${hasLabelBlock}, If: ${hasIfBlock}`);
         
         return { codeParts, hasLabelBlock, hasIfBlock };
+    }
+
+    /**
+     * Detect modifier chains in the workspace for special formatting
+     * @param {NodeList} blocks - All workspace blocks
+     * @returns {Array} Array of modifier chain objects with start/end indices
+     */
+    _detectModifierChains(blocks) {
+        console.log('Block Editor | Code Generator: Detecting modifier chains for formula mode');
+        
+        const chains = [];
+        let currentChain = null;
+        
+        Array.from(blocks).forEach((block, index) => {
+            const blockId = block.dataset.blockId;
+            
+            if (blockId === 'mod' || blockId === 'and') {
+                if (!currentChain) {
+                    // Start a new chain if we find a mod block
+                    if (blockId === 'mod') {
+                        currentChain = { startIndex: index, endIndex: index, blocks: [index] };
+                    }
+                } else {
+                    // Extend current chain
+                    currentChain.endIndex = index;
+                    currentChain.blocks.push(index);
+                }
+            } else {
+                // End current chain if we hit a non-mod, non-and block
+                if (currentChain && currentChain.blocks.length >= 3) { // At least mod + and + mod
+                    chains.push(currentChain);
+                    console.log(`Block Editor | Code Generator: Detected modifier chain from index ${currentChain.startIndex} to ${currentChain.endIndex}`);
+                }
+                currentChain = null;
+            }
+        });
+        
+        // Don't forget the last chain if it exists
+        if (currentChain && currentChain.blocks.length >= 3) {
+            chains.push(currentChain);
+            console.log(`Block Editor | Code Generator: Detected final modifier chain from index ${currentChain.startIndex} to ${currentChain.endIndex}`);
+        }
+        
+        return chains;
+    }
+
+    /**
+     * Process modifier chains to combine them into single bracketed expressions
+     * @param {Array} codeParts - Current code parts array
+     * @param {Array} modifierChains - Detected modifier chains
+     * @param {NodeList} blocks - All workspace blocks
+     * @returns {Array} Updated code parts with combined modifier chains
+     */
+    _processModifierChains(codeParts, modifierChains, blocks) {
+        console.log('Block Editor | Code Generator: Processing modifier chains for combination');
+        
+        // Process chains in reverse order to maintain indices
+        for (let i = modifierChains.length - 1; i >= 0; i--) {
+            const chain = modifierChains[i];
+            
+            // Extract the chain parts and combine them
+            const chainParts = [];
+            for (let j = chain.startIndex; j <= chain.endIndex; j++) {
+                const block = blocks[j];
+                const blockId = block.dataset.blockId;
+                const textarea = block.querySelector('.block-code textarea');
+                const content = textarea ? textarea.value.trim() : '';
+                
+                if (blockId === 'mod' && content) {
+                    chainParts.push(content);
+                } else if (blockId === 'and') {
+                    chainParts.push('&');
+                }
+            }
+            
+            // Combine into single expression
+            const combinedExpression = `[${chainParts.join(' ')}]`;
+            console.log(`Block Editor | Code Generator: Combined modifier chain: ${combinedExpression}`);
+            
+            // Replace the chain parts in codeParts with the combined expression
+            const startCodeIndex = this._findCodePartIndex(codeParts, chain.startIndex, blocks);
+            const endCodeIndex = this._findCodePartIndex(codeParts, chain.endIndex, blocks);
+            
+            if (startCodeIndex !== -1 && endCodeIndex !== -1) {
+                // Remove the individual parts and insert the combined expression
+                const removeCount = endCodeIndex - startCodeIndex + 1;
+                codeParts.splice(startCodeIndex, removeCount, combinedExpression);
+            }
+        }
+        
+        return codeParts;
+    }
+
+    /**
+     * Find the index in codeParts that corresponds to a block index
+     * @param {Array} codeParts - Current code parts
+     * @param {number} blockIndex - Block index to find
+     * @param {NodeList} blocks - All workspace blocks
+     * @returns {number} Index in codeParts or -1 if not found
+     */
+    _findCodePartIndex(codeParts, blockIndex, blocks) {
+        // This is a simplified approach - in practice, you might need more sophisticated mapping
+        // For now, we'll assume a 1:1 correspondence with some adjustments for skipped blocks
+        let codeIndex = 0;
+        
+        for (let i = 0; i <= blockIndex && codeIndex < codeParts.length; i++) {
+            const block = blocks[i];
+            const blockId = block.dataset.blockId;
+            const textarea = block.querySelector('.block-code textarea');
+            const hasContent = textarea && textarea.value.trim();
+            
+            if (hasContent) {
+                if (i === blockIndex) {
+                    return codeIndex;
+                }
+                codeIndex++;
+            }
+        }
+        
+        return -1;
     }
 
     /**
@@ -216,9 +359,10 @@ export class CodeGenerator {
      * @param {string} blockId - The block type identifier
      * @param {boolean} formulaMode - Whether formula mode is enabled
      * @param {boolean} specialBracketingActive - Whether special bracketing is active (Label + If present)
+     * @param {boolean} isInModifierChain - Whether this block is part of a modifier chain
      * @returns {string} Content with formula mode formatting applied
      */
-    _applyFormulaModeFormatting(content, blockId, formulaMode, specialBracketingActive) {
+    _applyFormulaModeFormatting(content, blockId, formulaMode, specialBracketingActive, isInModifierChain = false) {
         if (!formulaMode) {
             return content;
         }
@@ -237,6 +381,12 @@ export class CodeGenerator {
         // In formula mode, label blocks are NEVER wrapped in individual brackets
         if (blockId === 'label') {
             console.log(`Block Editor | Code Generator: Formula mode - label block not wrapped in individual brackets`);
+            return content;
+        }
+        
+        // Modifier and And blocks in chains are handled specially - don't wrap individually
+        if (isInModifierChain && (blockId === 'mod' || blockId === 'and')) {
+            console.log(`Block Editor | Code Generator: Formula mode - ${blockId} block in modifier chain, not wrapping individually`);
             return content;
         }
         
