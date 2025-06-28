@@ -1,0 +1,96 @@
+{
+  "block-editor": {
+    "settings": {
+      "autoOpen": {
+        "name": "Abrir automaticamente",
+        "hint": "Abre o editor de blocos automaticamente quando o mundo carrega"
+      }
+    },
+    "editor": {
+      "title": "Editor de Blocos - Foundry VTT",
+      "subtitle": "Arraste os blocos para a área de trabalho e organize-os para gerar código",
+      "palette": "Blocos Disponíveis",
+      "workspace": "Área de Trabalho",
+      "output": "Código Gerado",
+      "buttons": {
+        "clear": "Limpar",
+        "generate": "Gerar Código",
+        "copy": "Copiar",
+        "execute": "Executar",
+        "close": "Fechar",
+        "help": "Ajuda"
+      },
+      "messages": {
+        "blockAdded": "Bloco adicionado!",
+        "blockRemoved": "Bloco removido!",
+        "workspaceCleared": "Workspace limpo!",
+        "codeGenerated": "Código gerado com sucesso!",
+        "codeCopied": "Código copiado para a área de transferência!",
+        "codeExecuted": "Código executado! Verifique o console para detalhes.",
+        "noBlocks": "Adicione alguns blocos primeiro!",
+        "noCode": "Nenhum código para copiar!",
+        "copyError": "Erro ao copiar código!",
+        "executeError": "Erro ao executar código:",
+        "closed": "Editor de blocos fechado!"
+      }
+    },
+    "blocks": {
+      "atributos": {
+        "name": "Atributos",
+        "description": "Acessa os atributos do ator"
+      },
+      "value": {
+        "name": "Value",
+        "description": "Obtém o valor de um campo"
+      },
+      "equal": {
+        "name": "Equal",
+        "description": "Operador de igualdade"
+      },
+      "less": {
+        "name": "Less",
+        "description": "Operador menor que"
+      },
+      "plus": {
+        "name": "Plus",
+        "description": "Operador de adição"
+      },
+      "spells": {
+        "name": "Spells",
+        "description": "Acessa as magias do ator"
+      },
+      "skills": {
+        "name": "Skills",
+        "description": "Acessa as perícias do ator"
+      },
+      "costs": {
+        "name": "Costs",
+        "description": "Acessa a moeda do ator"
+      },
+      "text": {
+        "name": "Text",
+        "description": "Texto literal"
+      },
+      "label": {
+        "name": "Label",
+        "description": "Rótulo de um campo"
+      },
+      "or": {
+        "name": "Or",
+        "description": "Operador lógico OU"
+      },
+      "check": {
+        "name": "Check",
+        "description": "Inicia uma verificação condicional"
+      },
+      "if": {
+        "name": "If",
+        "description": "Bloco condicional if"
+      },
+      "else": {
+        "name": "Else",
+        "description": "Bloco condicional else"
+      }
+    }
+  }
+}

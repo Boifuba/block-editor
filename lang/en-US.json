@@ -1,0 +1,190 @@
+{
+  "block-editor": {
+    "settings": {
+      "autoOpen": {
+        "name": "Auto Open",
+        "hint": "Automatically opens the block editor when the world loads"
+      }
+    },
+    "editor": {
+      "title": "Block Editor - Foundry VTT",
+      "subtitle": "Drag blocks to the workspace and organize them to generate code",
+      "palette": "Available Blocks",
+      "workspace": "Workspace",
+      "output": "Generated Code",
+      "buttons": {
+        "clear": "Clear",
+        "generate": "Generate Code",
+        "copy": "Copy",
+        "execute": "Execute",
+        "close": "Close",
+        "help": "Help"
+      },
+      "checkboxes": {
+        "blind": "Blind",
+        "formula": "Formula",
+        "trueCondition": "True Condition"
+      },
+      "messages": {
+        "blockAdded": "Block added!",
+        "blockRemoved": "Block removed!",
+        "workspaceCleared": "Workspace cleared!",
+        "codeGenerated": "Code generated successfully!",
+        "codeCopied": "Code copied to clipboard!",
+        "codeExecuted": "Code executed! Check console for details.",
+        "noBlocks": "Add some blocks first!",
+        "noCode": "No code to copy!",
+        "copyError": "Error copying code!",
+        "executeError": "Error executing code:",
+        "closed": "Block editor closed!"
+      },
+      "placeholders": {
+        "editable": "Enter block content here...",
+        "readonly": "This block is fixed and not editable"
+      },
+      "dropZone": "Drag blocks here to start"
+    },
+    "blocks": {
+      "atributos": {
+        "name": "Attributes",
+        "description": "Access actor attributes"
+      },
+      "value": {
+        "name": "Value",
+        "description": "Gets the value of a field"
+      },
+      "equal": {
+        "name": "Equal",
+        "description": "Equality operator"
+      },
+      "less": {
+        "name": "Less",
+        "description": "Less than operator"
+      },
+      "plus": {
+        "name": "Plus",
+        "description": "Addition operator"
+      },
+      "spells": {
+        "name": "Spells",
+        "description": "Access actor spells"
+      },
+      "skills": {
+        "name": "Skills",
+        "description": "Access actor skills"
+      },
+      "costs": {
+        "name": "Costs",
+        "description": "Access actor currency"
+      },
+      "text": {
+        "name": "Text",
+        "description": "Literal text"
+      },
+      "label": {
+        "name": "Label",
+        "description": "Field label"
+      },
+      "or": {
+        "name": "Or",
+        "description": "Logical OR operator"
+      },
+      "check": {
+        "name": "Check",
+        "description": "Start a conditional check"
+      },
+      "if": {
+        "name": "If",
+        "description": "Conditional if block"
+      },
+      "else": {
+        "name": "Else",
+        "description": "Conditional else block"
+      },
+      "based": {
+        "name": "Based",
+        "description": "Based value prefix"
+      },
+      "mod": {
+        "name": "Mod",
+        "description": "Mathematical modifier"
+      },
+      "damage": {
+        "name": "Damage",
+        "description": "Damage dealt"
+      },
+      "line": {
+        "name": "Line",
+        "description": "Line separator"
+      },
+      "ranged": {
+        "name": "Ranged",
+        "description": "Ranged attack"
+      },
+      "melee": {
+        "name": "Melee",
+        "description": "Melee attack"
+      },
+      "weapond": {
+        "name": "Weapond",
+        "description": "Weapon damage"
+      },
+      "parry": {
+        "name": "Parry",
+        "description": "Parry action"
+      }
+    },
+    "help": {
+      "title": "Help - Block Editor",
+      "howToUse": "How to use the Block Editor",
+      "steps": {
+        "drag": "Drag blocks: Click and drag blocks from the palette to the workspace",
+        "edit": "Edit content: Click on each block's text field to edit it",
+        "reorder": "Reorder: Drag blocks within the workspace to reorder them",
+        "autoCode": "Automatic code: Code is generated automatically as you edit",
+        "execute": "Execute: Use \"Execute\" to test the generated code"
+      },
+      "blockTypes": "Block Types:",
+      "blockDescriptions": {
+        "data": "Attributes/Skills/Spells: To access actor data",
+        "label": "Label: For specific properties (always appears first)",
+        "operators": "Equal/Mod: Mathematical and logical operators",
+        "conditionals": "Check/If/Else: Conditional structures (fixed values)",
+        "text": "Text: Literal text",
+        "damage": "Damage: For damage dealt",
+        "line": "Line: Line separator (always generates \"/\")",
+        "combat": "Ranged/Melee/Weapond/Parry: Follow SK pattern (R:, M:, D:, P:)",
+        "or": "Or: Logical operator (always generates \"|\")",
+        "based": "Based: Based value with prefix \"Based:\""
+      },
+      "formatting": "Automatic formatting:",
+      "formatRules": {
+        "labelText": "Label/Text: Automatically wrapped in double quotes",
+        "skills": "Skills: Prefix \"Sk:\" added automatically (no space)",
+        "spells": "Spells: Prefix \"S:\" added automatically",
+        "costs": "Costs: Prefix \"*Costs\" added automatically",
+        "damage": "Damage: Direct value without prefix",
+        "ranged": "Ranged: Prefix \"R:\" added automatically (no space)",
+        "melee": "Melee: Prefix \"M:\" added automatically (no space)",
+        "weapond": "Weapond: Prefix \"D:\" added automatically (no space)",
+        "parry": "Parry: Prefix \"P:\" added automatically (no space)",
+        "equal": "Equal: Prefix \"=\" added automatically (no spaces)",
+        "mod": "Mod: No quotes, direct value",
+        "line": "Line: Always generates \"/\" automatically",
+        "or": "Or: Always generates \"|\" automatically",
+        "check": "Check: Always generates \"?\" automatically",
+        "ifElse": "If/Else: Always generate \"/if\" and \"/else\" automatically",
+        "based": "Based: Prefix \"Based:\" added automatically"
+      },
+      "checkboxes": "Checkboxes:",
+      "checkboxDescriptions": {
+        "blind": "Blind: Adds \"!\" prefix before Skills, Spells, and Attributes",
+        "formula": "Formula: Wraps each block in individual brackets instead of wrapping all",
+        "trueCondition": "True Condition: Adds \"?\" prefix before any block"
+      },
+      "example": "Usage example:",
+      "exampleText": "Drag a \"Label\" block, edit to \"My strength test\", then drag \"Attributes\" and edit to \"ST\". Result will be: [\"My strength test\" ST]",
+      "understood": "Understood"
+    }
+  }
+}

@@ -1,0 +1,469 @@
+/* Styles for Block Editor */
+.block-editor-dialog {
+    font-family: 'Signika', sans-serif;
+}
+
+.block-editor-dialog .window-content {
+    padding: 0;
+    background: #f8f9fa;
+}
+
+.block-editor-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.editor-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.5em;
+}
+
+.editor-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9em;
+}
+
+.editor-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 300px;
+}
+
+.blocks-palette {
+    background: white;
+    border-bottom: 2px solid #e9ecef;
+    padding: 15px;
+}
+
+.blocks-palette h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 1.1em;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.checkbox-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.checkbox-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9em;
+    color: #495057;
+    cursor: pointer;
+}
+
+.checkbox-controls input[type="checkbox"] {
+    margin: 0;
+}
+
+.palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    gap: 10px;
+}
+
+.block-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s ease;
+    width: 80px;
+    height: 80px;
+    font-size: 0.75em;
+    text-align: center;
+}
+
+.block-item:hover {
+    background: white;
+    border-color: #6c757d;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.block-item:active {
+    cursor: grabbing;
+}
+
+.block-item.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+.block-item i {
+    font-size: 1.2em;
+}
+
+.block-item span {
+    font-weight: 500;
+    color: #495057;
+    line-height: 1.1;
+}
+
+.workspace {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.workspace h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 1.1em;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.workspace-area {
+    flex: 1;
+    background: white;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    min-height: 150px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.workspace-area.drag-over {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.drop-zone {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    text-align: center;
+}
+
+.drop-zone i {
+    font-size: 3em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.drop-zone p {
+    font-size: 1.1em;
+    margin: 0;
+}
+
+.workspace-block {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    margin: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    min-width: 150px;
+    flex-shrink: 0;
+    cursor: move;
+    position: relative;
+}
+
+.workspace-block:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.workspace-block.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.block-header {
+    background: #6c757d;
+    color: white;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 0.9em;
+    height: 32px;
+}
+
+.block-header i {
+    font-size: 1em;
+}
+
+.remove-block {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 2px;
+    transition: background 0.2s ease;
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.remove-block:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.block-code {
+    padding: 0;
+}
+
+.block-code textarea {
+    width: 100%;
+    min-height: 40px;
+    height: 40px;
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    color: #495057;
+    font-size: 0.85em;
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 8px 12px;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    box-shadow: none;
+}
+
+.block-code textarea:focus {
+    background: white;
+    box-shadow: none;
+}
+
+.block-code textarea[readonly] {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.code-output {
+    background: white;
+    border-top: 2px solid #e9ecef;
+    padding: 15px 20px;
+}
+
+.code-output h3 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 1.1em;
+}
+
+#codigo-gerado {
+    width: 100%;
+    height: 30px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: 6px 10px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+    color: #495057;
+    resize: none;
+    overflow: hidden;
+}
+
+#codigo-gerado:focus {
+    outline: none;
+    border-color: #007bff;
+    background: white;
+}
+
+.output-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+
+/* Buttons */
+.btn-clear,
+.btn-copy,
+.btn-execute {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-clear {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-clear:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.btn-copy {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-copy:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.btn-execute {
+    background: #007bff;
+    color: white;
+}
+
+.btn-execute:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* Styles for chat messages */
+.code-execution {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 5px 0;
+    border: 1px solid #dee2e6;
+}
+
+.code-execution h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: #495057;
+}
+
+.code-execution pre {
+    background: #e9ecef;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 0;
+    overflow-x: auto;
+}
+
+.code-execution code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+/* Responsiveness */
+@media (max-width: 800px) {
+    .editor-main {
+        flex-direction: column;
+    }
+    
+    .blocks-palette {
+        width: 100%;
+    }
+    
+    .palette-grid {
+        grid-template-columns: repeat(auto-fill, 80px);
+    }
+    
+    .output-controls {
+        flex-wrap: wrap;
+    }
+    
+    .workspace-area {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .workspace-block {
+        max-width: none;
+    }
+    
+    .checkbox-controls {
+        justify-content: center;
+    }
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.block-editor-dialog {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes blockDrop {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.workspace-block {
+    animation: blockDrop 0.3s ease-out;
+}
+
+/* Drag and drop visual feedback */
+.workspace-area.drag-over-block {
+    background: #e3f2fd;
+}
+
+.drop-indicator {
+    width: 4px;
+    height: 100px;
+    background: #007bff;
+    border-radius: 2px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
