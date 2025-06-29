@@ -10,7 +10,7 @@
  * - Handling Normal vs Formula mode differences
  * - Assembling final code with proper wrapping and syntax
  * - Special bracketing when Label and If blocks are both present
- * - Special handling for Based blocks ONLY with spells context
+ * - Special handling for Based blocks with ALL block types (not just spells)
  * - Special handling for modifier chains with & operators in Formula mode
  */
 
@@ -287,8 +287,23 @@ export class CodeGenerator {
             'label': (content) => `"${content}"`,
             'text': (content) => `"${content}"`,
             
-            // Actor data blocks - with optional blind prefix
-            'skills': (content, blindMode) => blindMode ? `!Sk:${content}` : `Sk:${content}`,
+            // Actor data blocks - with optional blind prefix and Based support
+            'skills': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as Sk:Skillname (Based:Attribute)
+                    const prefix = blindMode ? '!' : '';
+                    console.log(`Block Editor | Code Generator: Skills block followed by based block - formatting as combined expression`);
+                    return `${prefix}Sk:${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal skills formatting
+                    return blindMode ? `!Sk:${content}` : `Sk:${content}`;
+                }
+            },
             'spells': (content, blindMode, allBlocks, currentIndex) => {
                 // Check if the next block is a 'based' block
                 const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
@@ -296,7 +311,7 @@ export class CodeGenerator {
                 const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
                 
                 if (nextBlockId === 'based' && nextBlockContent) {
-                    // Format as S:Spellname (Based:Attribute) - ONLY for spells
+                    // Format as S:Spellname (Based:Attribute)
                     const prefix = blindMode ? '!' : '';
                     console.log(`Block Editor | Code Generator: Spells block followed by based block - formatting as combined expression`);
                     return `${prefix}S:${content} (Based:${nextBlockContent})`;
@@ -305,26 +320,142 @@ export class CodeGenerator {
                     return blindMode ? `!S: ${content}` : `S: ${content}`;
                 }
             },
-            'atributos': (content, blindMode) => blindMode ? `!${content}` : content,
-            'costs': (content) => `*Costs ${content}`,
+            'atributos': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as Attribute (Based:OtherAttribute)
+                    const prefix = blindMode ? '!' : '';
+                    console.log(`Block Editor | Code Generator: Attributes block followed by based block - formatting as combined expression`);
+                    return `${prefix}${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal attributes formatting
+                    return blindMode ? `!${content}` : content;
+                }
+            },
+            'costs': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as *Costs content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Costs block followed by based block - formatting as combined expression`);
+                    return `*Costs ${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal costs formatting
+                    return `*Costs ${content}`;
+                }
+            },
             
-            // Combat blocks - SK system prefixes
-            'ranged': (content) => `R:${content}`,
-            'melee': (content) => `M:${content}`,
-            'weapond': (content) => `D:"${content}"`,
-            'parry': (content) => `P:${content}`,
+            // Combat blocks - SK system prefixes with Based support
+            'ranged': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as R:content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Ranged block followed by based block - formatting as combined expression`);
+                    return `R:${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal ranged formatting
+                    return `R:${content}`;
+                }
+            },
+            'melee': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as M:content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Melee block followed by based block - formatting as combined expression`);
+                    return `M:${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal melee formatting
+                    return `M:${content}`;
+                }
+            },
+            'weapond': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as D:"content" (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Weapon damage block followed by based block - formatting as combined expression`);
+                    return `D:"${content}" (Based:${nextBlockContent})`;
+                } else {
+                    // Normal weapon damage formatting
+                    return `D:"${content}"`;
+                }
+            },
+            'parry': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as P:content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Parry block followed by based block - formatting as combined expression`);
+                    return `P:${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal parry formatting
+                    return `P:${content}`;
+                }
+            },
             
             // Utility blocks
-            'damage': (content) => content,
-            'mod': (content) => content,
+            'damage': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Damage block followed by based block - formatting as combined expression`);
+                    return `${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal damage formatting
+                    return content;
+                }
+            },
+            'mod': (content, blindMode, allBlocks, currentIndex) => {
+                // Check if the next block is a 'based' block
+                const nextBlock = allBlocks && currentIndex < allBlocks.length - 1 ? allBlocks[currentIndex + 1] : null;
+                const nextBlockId = nextBlock ? nextBlock.dataset.blockId : null;
+                const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
+                
+                if (nextBlockId === 'based' && nextBlockContent) {
+                    // Format as content (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Modifier block followed by based block - formatting as combined expression`);
+                    return `${content} (Based:${nextBlockContent})`;
+                } else {
+                    // Normal modifier formatting
+                    return content;
+                }
+            },
             'based': (content, blindMode, allBlocks, currentIndex) => {
-                // Check if the previous block was a spells block
+                // Check if the previous block was any block that can consume based blocks
                 const prevBlock = allBlocks && currentIndex > 0 ? allBlocks[currentIndex - 1] : null;
                 const prevBlockId = prevBlock ? prevBlock.dataset.blockId : null;
                 
-                if (prevBlockId === 'spells') {
-                    // Skip this block as it was already processed with the spells block
-                    console.log(`Block Editor | Code Generator: Based block following spells - skipping as it was already processed`);
+                // List of block types that can consume based blocks
+                const consumingBlocks = ['spells', 'skills', 'atributos', 'costs', 'ranged', 'melee', 'weapond', 'parry', 'damage', 'mod'];
+                
+                if (prevBlockId && consumingBlocks.includes(prevBlockId)) {
+                    // Skip this block as it was already processed with the previous block
+                    console.log(`Block Editor | Code Generator: Based block following ${prevBlockId} - skipping as it was already processed`);
                     return null; // Return null to indicate this block should be skipped
                 } else {
                     // Standalone based block - always format with parentheses (Based:Attribute)
@@ -368,7 +499,7 @@ export class CodeGenerator {
             return content;
         }
         
-        // Skip null content (e.g., based blocks that were processed with spells)
+        // Skip null content (e.g., based blocks that were processed with other blocks)
         if (content === null) {
             return null;
         }
@@ -419,7 +550,7 @@ export class CodeGenerator {
      * @returns {string} Final assembled code string
      */
     _assembleFinalCode(codeParts, formulaMode, hasLabelBlock, hasIfBlock) {
-        // Filter out null parts (e.g., based blocks that were processed with spells)
+        // Filter out null parts (e.g., based blocks that were processed with other blocks)
         const filteredParts = codeParts.filter(part => part !== null);
         
         if (filteredParts.length === 0) {
