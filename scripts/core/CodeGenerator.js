@@ -10,7 +10,7 @@
  * - Handling Normal vs Formula mode differences
  * - Assembling final code with proper wrapping and syntax
  * - Special bracketing when Label and If blocks are both present
- * - Special handling for Based blocks in spells context
+ * - Special handling for Based blocks ONLY with spells context
  * - Special handling for modifier chains with & operators in Formula mode
  */
 
@@ -296,7 +296,7 @@ export class CodeGenerator {
                 const nextBlockContent = nextBlock ? nextBlock.querySelector('.block-code textarea')?.value?.trim() : null;
                 
                 if (nextBlockId === 'based' && nextBlockContent) {
-                    // Format as S:Spellname (Based:Attribute)
+                    // Format as S:Spellname (Based:Attribute) - ONLY for spells
                     const prefix = blindMode ? '!' : '';
                     console.log(`Block Editor | Code Generator: Spells block followed by based block - formatting as combined expression`);
                     return `${prefix}S:${content} (Based:${nextBlockContent})`;
@@ -327,7 +327,8 @@ export class CodeGenerator {
                     console.log(`Block Editor | Code Generator: Based block following spells - skipping as it was already processed`);
                     return null; // Return null to indicate this block should be skipped
                 } else {
-                    // Standalone based block
+                    // Standalone based block - ONLY works with other block types, not skills
+                    console.log(`Block Editor | Code Generator: Standalone based block - formatting with Based: prefix`);
                     return `Based:${content}`;
                 }
             },
