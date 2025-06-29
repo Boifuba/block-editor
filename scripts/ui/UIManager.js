@@ -11,6 +11,7 @@
  * - Coordinating with CodeGenerator for automatic code generation
  * - Managing user interactions (copy, execute, clear)
  * - Applying visual feedback based on validation rules
+ * - Displaying validation notifications to users
  */
 
 import { FORMULA_ONLY_BLOCKS, READONLY_BLOCKS } from '../constants.js';
@@ -28,6 +29,7 @@ export class UIManager {
         this.workspaceBlocks = [];
         this.draggedElement = null;
         this.draggedFromPalette = false;
+        this._lastNotifiedIssueDescription = null;
         
         console.log('Block Editor | UI Manager: Initializing interface components');
         this._initializeInterface();
@@ -397,6 +399,7 @@ export class UIManager {
         this.workspaceBlocks = [];
         this._showDropZone();
         this.html.find('#codigo-gerado').val('');
+        this._lastNotifiedIssueDescription = null; // Reset notification tracking
         
         ui.notifications.info("Workspace cleared successfully.");
         console.log('Block Editor | UI Manager: Workspace cleared and reset to initial state');
@@ -501,7 +504,7 @@ export class UIManager {
     }
 
     /**
-     * Apply visual feedback based on validation rules
+     * Apply visual feedback based on validation rules and display notifications
      */
     _applyVisualFeedback() {
         console.log('Block Editor | UI Manager: Applying visual feedback based on validation rules');
@@ -541,8 +544,32 @@ export class UIManager {
                     console.log(`Block Editor | UI Manager: Applied ${issue.severity} highlight to block: ${blockToHighlight.dataset.blockId}`);
                 }
             });
+            
+            // Display notification for the first warning or error issue
+            const filteredIssues = validationIssues.filter(issue => 
+                issue.severity === 'warning' || issue.severity === 'error'
+            );
+            
+            if (filteredIssues.length > 0) {
+                const issueToNotify = filteredIssues[0];
+                
+                // Only notify if this is a different issue than the last one
+                if (issueToNotify.description !== this._lastNotifiedIssueDescription) {
+                    this._lastNotifiedIssueDescription = issueToNotify.description;
+                    
+                    console.log(`Block Editor | UI Manager: Displaying ${issueToNotify.severity} notification: ${issueToNotify.description}`);
+                    
+                    if (issueToNotify.severity === 'error') {
+                        ui.notifications.error(issueToNotify.description);
+                    } else if (issueToNotify.severity === 'warning') {
+                        ui.notifications.warn(issueToNotify.description);
+                    }
+                }
+            }
         } else {
             console.log('Block Editor | UI Manager: No validation issues found - workspace is clean');
+            // Reset notification tracking when no issues are found
+            this._lastNotifiedIssueDescription = null;
         }
     }
 

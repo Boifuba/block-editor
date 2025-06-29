@@ -16,18 +16,27 @@
 
 export const VALIDATION_RULES = [
     {
+        id: 'consecutive-if',
+        name: 'Consecutive If Blocks',
+        description: 'Detecta blocos "If" consecutivos, o que pode indicar redundância lógica ou um problema estrutural.',
+        pattern: ['if', 'if'],
+        highlightIndex: -1,
+        severity: 'warning',
+        enabled: true
+    },
+    {
         id: 'consecutive-skills-after-label',
         name: 'Consecutive Skills After Label',
-        description: 'Highlights the last skill when multiple skills follow a label block',
+        description: 'Múltiplas perícias após um bloco de rótulo podem causar confusão na interpretação do código.',
         pattern: ['label', 'skills', 'skills'],
-        highlightIndex: -1, // -1 means last block in pattern
+        highlightIndex: -1,
         severity: 'warning',
         enabled: true
     },
     {
         id: 'multiple-consecutive-skills',
         name: 'Multiple Consecutive Skills',
-        description: 'Highlights when more than two skills are used consecutively',
+        description: 'Três ou mais blocos de perícias consecutivos podem indicar estrutura desnecessariamente complexa.',
         pattern: ['skills', 'skills', 'skills'],
         highlightIndex: -1,
         severity: 'error',
@@ -36,25 +45,16 @@ export const VALIDATION_RULES = [
     {
         id: 'consecutive-attributes',
         name: 'Consecutive Attributes',
-        description: 'Highlights when multiple attributes are used consecutively',
+        description: 'Múltiplos atributos consecutivos podem indicar redundância ou erro de estruturação.',
         pattern: ['atributos', 'atributos'],
         highlightIndex: -1,
         severity: 'warning',
         enabled: true
     },
     {
-        id: 'text-without-context',
-        name: 'Isolated Text Block',
-        description: 'Highlights text blocks that appear without proper context',
-        pattern: ['text'],
-        highlightIndex: 0,
-        severity: 'info',
-        enabled: false // Disabled by default as it might be too noisy
-    },
-    {
         id: 'damage-before-attack',
         name: 'Damage Before Attack',
-        description: 'Highlights damage blocks that appear before attack blocks',
+        description: 'Bloco de dano antes de ataque corpo a corpo pode indicar ordem incorreta dos elementos.',
         pattern: ['damage', 'melee'],
         highlightIndex: 0,
         severity: 'warning',
@@ -63,10 +63,28 @@ export const VALIDATION_RULES = [
     {
         id: 'damage-before-ranged',
         name: 'Damage Before Ranged',
-        description: 'Highlights damage blocks that appear before ranged blocks',
+        description: 'Bloco de dano antes de ataque à distância pode indicar ordem incorreta dos elementos.',
         pattern: ['damage', 'ranged'],
         highlightIndex: 0,
         severity: 'warning',
+        enabled: true
+    },
+    {
+        id: 'unmatched-group-start',
+        name: 'Unmatched Group Start',
+        description: 'Bloco de início de grupo sem correspondente bloco de fim pode causar erro de sintaxe.',
+        pattern: ['group-start'],
+        highlightIndex: 0,
+        severity: 'error',
+        enabled: true
+    },
+    {
+        id: 'unmatched-group-end',
+        name: 'Unmatched Group End',
+        description: 'Bloco de fim de grupo sem correspondente bloco de início pode causar erro de sintaxe.',
+        pattern: ['group-end'],
+        highlightIndex: 0,
+        severity: 'error',
         enabled: true
     }
 ];
@@ -97,6 +115,50 @@ export function matchesPattern(blockSequence, pattern) {
 }
 
 /**
+ * Validate group block matching
+ * @param {Array} workspaceBlocks - Array of block IDs in workspace order
+ * @returns {Array} Array of group validation issues
+ */
+export function validateGroupBlocks(workspaceBlocks) {
+    const issues = [];
+    const groupStack = [];
+    
+    workspaceBlocks.forEach((blockId, index) => {
+        if (blockId === 'group-start') {
+            groupStack.push(index);
+        } else if (blockId === 'group-end') {
+            if (groupStack.length === 0) {
+                // Unmatched group-end
+                issues.push({
+                    ruleId: 'unmatched-group-end',
+                    ruleName: 'Unmatched Group End',
+                    description: 'Bloco de fim de grupo sem correspondente bloco de início pode causar erro de sintaxe.',
+                    severity: 'error',
+                    highlightIndex: index,
+                    cssClass: SEVERITY_CLASSES.error
+                });
+            } else {
+                groupStack.pop();
+            }
+        }
+    });
+    
+    // Check for unmatched group-start blocks
+    groupStack.forEach(startIndex => {
+        issues.push({
+            ruleId: 'unmatched-group-start',
+            ruleName: 'Unmatched Group Start',
+            description: 'Bloco de início de grupo sem correspondente bloco de fim pode causar erro de sintaxe.',
+            severity: 'error',
+            highlightIndex: startIndex,
+            cssClass: SEVERITY_CLASSES.error
+        });
+    });
+    
+    return issues;
+}
+
+/**
  * Find all validation issues in a workspace
  * @param {Array} workspaceBlocks - Array of block IDs in workspace order
  * @returns {Array} Array of validation issues found
@@ -107,7 +169,13 @@ export function validateWorkspace(workspaceBlocks) {
     // Only check enabled rules
     const enabledRules = VALIDATION_RULES.filter(rule => rule.enabled);
     
+    // Check pattern-based rules
     for (const rule of enabledRules) {
+        // Skip group validation rules as they are handled separately
+        if (rule.id === 'unmatched-group-start' || rule.id === 'unmatched-group-end') {
+            continue;
+        }
+        
         // Check each possible position in the workspace
         for (let i = rule.pattern.length - 1; i < workspaceBlocks.length; i++) {
             const sequence = workspaceBlocks.slice(i - rule.pattern.length + 1, i + 1);
@@ -132,6 +200,10 @@ export function validateWorkspace(workspaceBlocks) {
             }
         }
     }
+    
+    // Add group validation issues
+    const groupIssues = validateGroupBlocks(workspaceBlocks);
+    issues.push(...groupIssues);
     
     return issues;
 }
