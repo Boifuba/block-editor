@@ -327,9 +327,9 @@ export class CodeGenerator {
                     console.log(`Block Editor | Code Generator: Based block following spells - skipping as it was already processed`);
                     return null; // Return null to indicate this block should be skipped
                 } else {
-                    // Standalone based block - ONLY works with other block types, not skills
-                    console.log(`Block Editor | Code Generator: Standalone based block - formatting with Based: prefix`);
-                    return `Based:${content}`;
+                    // Standalone based block - always format with parentheses (Based:Attribute)
+                    console.log(`Block Editor | Code Generator: Standalone based block - formatting with (Based:) format`);
+                    return `(Based:${content})`;
                 }
             },
             
