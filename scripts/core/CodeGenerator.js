@@ -385,6 +385,12 @@ export class CodeGenerator {
             return content;
         }
         
+        // BASED blocks are NEVER wrapped in individual brackets in formula mode
+        if (blockId === 'based') {
+            console.log(`Block Editor | Code Generator: Formula mode - based block not wrapped in individual brackets`);
+            return content;
+        }
+        
         // Modifier and And blocks in chains are handled specially - don't wrap individually
         if (isInModifierChain && (blockId === 'mod' || blockId === 'and')) {
             console.log(`Block Editor | Code Generator: Formula mode - ${blockId} block in modifier chain, not wrapping individually`);
