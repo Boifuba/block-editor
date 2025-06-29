@@ -123,6 +123,29 @@
     line-height: 1.1;
 }
 
+/* Special styling for group blocks */
+.block-item[data-block-id="group-start"] {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-color: #28a745;
+}
+
+.block-item[data-block-id="group-start"]:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    border-color: #1e7e34;
+}
+
+.block-item[data-block-id="group-end"] {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+    color: white;
+    border-color: #dc3545;
+}
+
+.block-item[data-block-id="group-end"]:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    border-color: #bd2130;
+}
+
 .workspace {
     flex: 1;
     padding: 15px;
@@ -204,6 +227,27 @@
 .workspace-block.dragging {
     opacity: 0.5;
     transform: rotate(2deg);
+}
+
+/* Special styling for group blocks in workspace */
+.workspace-block[data-block-id="group-start"] {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.workspace-block[data-block-id="group-start"] .block-header {
+    background: #28a745;
+    color: white;
+}
+
+.workspace-block[data-block-id="group-end"] {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+
+.workspace-block[data-block-id="group-end"] .block-header {
+    background: #dc3545;
+    color: white;
 }
 
 /* Visual feedback classes for validation */
@@ -548,4 +592,33 @@
     border-radius: 2px;
     opacity: 0.7;
     transition: opacity 0.2s ease;
+}
+
+/* Group block visual indicators */
+.workspace-block[data-block-id="group-start"]::before {
+    content: "GROUP START";
+    position: absolute;
+    top: -12px;
+    left: 8px;
+    background: #28a745;
+    color: white;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.workspace-block[data-block-id="group-end"]::before {
+    content: "GROUP END";
+    position: absolute;
+    top: -12px;
+    left: 8px;
+    background: #dc3545;
+    color: white;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    z-index: 5;
 }

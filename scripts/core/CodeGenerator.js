@@ -12,6 +12,7 @@
  * - Special bracketing when Label and If blocks are both present
  * - Special handling for Based blocks with ALL block types (not just spells)
  * - Special handling for modifier chains with & operators in Formula mode
+ * - Processing group blocks to create grouped code structures with curly braces
  */
 
 import { AVAILABLE_BLOCKS } from '../constants.js';
@@ -71,55 +72,61 @@ export class CodeGenerator {
         // In formula mode, detect modifier chains for special handling
         const modifierChains = settings.formula ? this._detectModifierChains(blocks) : [];
         
-        blocks.forEach((block, index) => {
-            const blockId = block.dataset.blockId;
-            const textarea = block.querySelector('.block-code textarea');
-            
-            // Track presence of label and if blocks
-            if (blockId === 'label') {
-                hasLabelBlock = true;
-            }
-            if (blockId === 'if') {
-                hasIfBlock = true;
-            }
-            
-            if (textarea && textarea.value.trim()) {
-                const content = textarea.value.trim();
-                console.log(`Block Editor | Code Generator: Processing block ${index + 1}/${blocks.length} - Type: ${blockId}, Content: "${content}"`);
+        // Process groups if in formula mode
+        if (settings.formula) {
+            codeParts = this._processGroupedBlocks(blocks, settings);
+        } else {
+            // Normal processing for non-formula mode
+            blocks.forEach((block, index) => {
+                const blockId = block.dataset.blockId;
+                const textarea = block.querySelector('.block-code textarea');
                 
-                // Check if this block is part of a modifier chain
-                const isInModifierChain = modifierChains.some(chain => 
-                    chain.startIndex <= index && index <= chain.endIndex
-                );
-                
-                // Format the block content according to its type and settings
-                const formattedContent = this._formatBlockContent(blockId, content, settings.blind, blocks, index);
-                
-                // Handle special comma separation for consecutive text blocks
-                if (this._shouldAddCommaSeparator(lastBlockType, blockId, codeParts)) {
-                    console.log('Block Editor | Code Generator: Adding comma separator for consecutive text blocks');
-                    codeParts[codeParts.length - 1] += ',';
+                // Track presence of label and if blocks
+                if (blockId === 'label') {
+                    hasLabelBlock = true;
+                }
+                if (blockId === 'if') {
+                    hasIfBlock = true;
                 }
                 
-                // Calculate if special bracketing is active
-                const specialBracketingActive = hasLabelBlock && hasIfBlock;
-                
-                // Apply formula mode formatting if enabled
-                const finalContent = this._applyFormulaModeFormatting(
-                    formattedContent, 
-                    blockId, 
-                    settings.formula, 
-                    specialBracketingActive,
-                    isInModifierChain
-                );
-                
-                if (finalContent !== null) {
-                    codeParts.push(finalContent);
+                if (textarea && textarea.value.trim()) {
+                    const content = textarea.value.trim();
+                    console.log(`Block Editor | Code Generator: Processing block ${index + 1}/${blocks.length} - Type: ${blockId}, Content: "${content}"`);
+                    
+                    // Check if this block is part of a modifier chain
+                    const isInModifierChain = modifierChains.some(chain => 
+                        chain.startIndex <= index && index <= chain.endIndex
+                    );
+                    
+                    // Format the block content according to its type and settings
+                    const formattedContent = this._formatBlockContent(blockId, content, settings.blind, blocks, index);
+                    
+                    // Handle special comma separation for consecutive text blocks
+                    if (this._shouldAddCommaSeparator(lastBlockType, blockId, codeParts)) {
+                        console.log('Block Editor | Code Generator: Adding comma separator for consecutive text blocks');
+                        codeParts[codeParts.length - 1] += ',';
+                    }
+                    
+                    // Calculate if special bracketing is active
+                    const specialBracketingActive = hasLabelBlock && hasIfBlock;
+                    
+                    // Apply formula mode formatting if enabled
+                    const finalContent = this._applyFormulaModeFormatting(
+                        formattedContent, 
+                        blockId, 
+                        settings.formula, 
+                        specialBracketingActive,
+                        isInModifierChain
+                    );
+                    
+                    if (finalContent !== null) {
+                        codeParts.push(finalContent);
+                    }
+                    
+                    lastBlockType = blockId;
                 }
-                
-                lastBlockType = blockId;
-            }
-        });
+            });
+        }
         
         // Post-process modifier chains in formula mode
         if (settings.formula && modifierChains.length > 0) {
@@ -130,6 +137,87 @@ export class CodeGenerator {
         console.log(`Block Editor | Code Generator: Block presence - Label: ${hasLabelBlock}, If: ${hasIfBlock}`);
         
         return { codeParts, hasLabelBlock, hasIfBlock };
+    }
+
+    /**
+     * Process blocks with group support for formula mode
+     * @param {NodeList} blocks - The workspace block elements
+     * @param {Object} settings - Current checkbox settings
+     * @returns {Array} Array of processed code parts with groups
+     */
+    _processGroupedBlocks(blocks, settings) {
+        console.log('Block Editor | Code Generator: Processing blocks with group support');
+        
+        const codeParts = [];
+        const groupStack = [];
+        let currentGroup = null;
+        
+        Array.from(blocks).forEach((block, index) => {
+            const blockId = block.dataset.blockId;
+            const textarea = block.querySelector('.block-code textarea');
+            
+            if (blockId === 'group-start') {
+                console.log(`Block Editor | Code Generator: Starting new group at index ${index}`);
+                // Start a new group
+                currentGroup = {
+                    startIndex: index,
+                    parts: []
+                };
+                groupStack.push(currentGroup);
+                // Add the opening brace
+                codeParts.push('{');
+                return;
+            }
+            
+            if (blockId === 'group-end') {
+                console.log(`Block Editor | Code Generator: Ending group at index ${index}`);
+                // End the current group
+                if (groupStack.length > 0) {
+                    const completedGroup = groupStack.pop();
+                    currentGroup = groupStack.length > 0 ? groupStack[groupStack.length - 1] : null;
+                    
+                    // Add the closing brace
+                    codeParts.push('}');
+                } else {
+                    console.warn('Block Editor | Code Generator: Group end without matching group start');
+                    codeParts.push('}');
+                }
+                return;
+            }
+            
+            // Process regular blocks
+            if (textarea && (textarea.value.trim() || blockId === 'or' || blockId === 'check' || blockId === 'if' || blockId === 'else' || blockId === 'line' || blockId === 'and')) {
+                const content = textarea.value.trim();
+                console.log(`Block Editor | Code Generator: Processing block ${index + 1}/${blocks.length} - Type: ${blockId}, Content: "${content}"`);
+                
+                // Format the block content according to its type and settings
+                const formattedContent = this._formatBlockContent(blockId, content, settings.blind, blocks, index);
+                
+                // Apply formula mode formatting
+                const finalContent = this._applyFormulaModeFormatting(
+                    formattedContent, 
+                    blockId, 
+                    settings.formula, 
+                    false, // Special bracketing not applicable in grouped mode
+                    false  // Modifier chains handled separately
+                );
+                
+                if (finalContent !== null) {
+                    if (currentGroup) {
+                        // Add to current group
+                        currentGroup.parts.push(finalContent);
+                    }
+                    codeParts.push(finalContent);
+                }
+            }
+        });
+        
+        // Warn about unclosed groups
+        if (groupStack.length > 0) {
+            console.warn(`Block Editor | Code Generator: ${groupStack.length} unclosed groups detected`);
+        }
+        
+        return codeParts;
     }
 
     /**
@@ -470,7 +558,9 @@ export class CodeGenerator {
             'check': () => '?',
             'if': () => '/if',
             'else': () => '/else',
-            'line': () => '/'
+            'line': () => '/',
+            'group-start': () => '{',
+            'group-end': () => '}'
         };
     }
 
@@ -519,6 +609,12 @@ export class CodeGenerator {
         // BASED blocks are NEVER wrapped in individual brackets in formula mode
         if (blockId === 'based') {
             console.log(`Block Editor | Code Generator: Formula mode - based block not wrapped in individual brackets`);
+            return content;
+        }
+        
+        // Group blocks are NEVER wrapped in individual brackets in formula mode
+        if (blockId === 'group-start' || blockId === 'group-end') {
+            console.log(`Block Editor | Code Generator: Formula mode - ${blockId} block not wrapped in individual brackets`);
             return content;
         }
         

@@ -11,6 +11,7 @@
  * - Operator blocks: Mathematical and logical operators
  * - Combat blocks: SK system combat values (ranged, melee, weapon damage, parry)
  * - Conditional blocks: Formula mode only (if, else, check, line, based, and)
+ * - Group blocks: Formula mode only (group-start, group-end) for creating code groups
  * - Utility blocks: Damage values and modifiers
  */
 
@@ -137,6 +138,20 @@ export const AVAILABLE_BLOCKS = {
         icone: 'fas fa-brain',
         codigo: '',
         descricao: "Based on another value (Based: prefix, Formula Mode only)"
+    },
+
+    // Group Blocks (Formula Mode Only)
+    'group-start': {
+        nome: "Group Start",
+        icone: 'fas fa-folder-open',
+        codigo: '{',
+        descricao: "Start a code group (always generates {, Formula Mode only)"
+    },
+    'group-end': {
+        nome: "Group End",
+        icone: 'fas fa-folder',
+        codigo: '}',
+        descricao: "End a code group (always generates }, Formula Mode only)"
     }
 };
 
@@ -144,13 +159,13 @@ export const AVAILABLE_BLOCKS = {
  * Blocks that are only visible in Formula Mode
  * These blocks provide conditional logic and advanced formatting
  */
-export const FORMULA_ONLY_BLOCKS = ['if', 'else', 'line', 'based', 'and'];
+export const FORMULA_ONLY_BLOCKS = ['if', 'else', 'line', 'based', 'and', 'group-start', 'group-end'];
 
 /**
  * Blocks that have fixed, non-editable content
  * These blocks always generate the same output regardless of user input
  */
-export const READONLY_BLOCKS = ['or', 'check', 'if', 'else', 'line', 'and'];
+export const READONLY_BLOCKS = ['or', 'check', 'if', 'else', 'line', 'and', 'group-start', 'group-end'];
 
 /**
  * HTML template for the Block Editor dialog
