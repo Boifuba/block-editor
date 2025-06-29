@@ -134,7 +134,7 @@ export const AVAILABLE_BLOCKS = {
     },
     'based': {
         nome: "Based",
-        icone: 'fas fa-foundation',
+        icone: 'fas fa-brain',
         codigo: '',
         descricao: "Based on another value (Based: prefix, Formula Mode only)"
     }
